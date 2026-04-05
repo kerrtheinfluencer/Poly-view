@@ -7,639 +7,409 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#050810;--bg2:#0a0e1a;--bg3:#0f1525;--bg4:#151d30;
+  --bg:#050810;--bg2:#0a0e1a;--bg3:#0f1525;
   --border:rgba(139,92,246,0.09);--border2:rgba(139,92,246,0.2);--border3:rgba(139,92,246,0.38);
   --text:#e8e0ff;--text2:#7a6fa8;--text3:#3d3560;
   --purple:#8b5cf6;--purple2:rgba(139,92,246,0.1);
   --green:#10b981;--green2:rgba(16,185,129,0.1);
   --red:#ef4444;--red2:rgba(239,68,68,0.1);
   --amber:#f59e0b;--amber2:rgba(245,158,11,0.1);
-  --blue:#3b82f6;--blue2:rgba(59,130,246,0.1);
-  --gold:#fbbf24;--gold2:rgba(251,191,36,0.12);
+  --blue:#3b82f6;--gold:#fbbf24;
   --r:14px;--r2:9px;
 }
 body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;font-size:14px;line-height:1.5}
-
 header{background:var(--bg2);border-bottom:1px solid var(--border2);padding:11px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;gap:10px;flex-wrap:wrap}
 .logo{display:flex;align-items:center;gap:11px}
-.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#8b5cf6,#3b82f6);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;color:#fff;flex-shrink:0}
-.logo-title{font-size:15px;font-weight:700;background:linear-gradient(135deg,#c4b5fd,#93c5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.logo-sub{font-size:11px;color:var(--text3)}
-.hbadge{font-size:11px;padding:3px 10px;border-radius:999px;background:var(--green2);color:var(--green);border:1px solid rgba(16,185,129,.25);display:flex;align-items:center;gap:5px}
-.pulse{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pls 2s ease-in-out infinite;flex-shrink:0}
+.li{width:36px;height:36px;background:linear-gradient(135deg,#8b5cf6,#3b82f6);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;color:#fff;flex-shrink:0}
+.lt{font-size:15px;font-weight:700;background:linear-gradient(135deg,#c4b5fd,#93c5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.ls{font-size:11px;color:var(--text3)}
+.hb{font-size:11px;padding:3px 10px;border-radius:999px;background:var(--green2);color:var(--green);border:1px solid rgba(16,185,129,.25);display:flex;align-items:center;gap:5px}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pls 2s infinite;flex-shrink:0}
 @keyframes pls{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.5)}50%{box-shadow:0 0 0 5px rgba(16,185,129,0)}}
-
-main{max-width:900px;margin:0 auto;padding:14px 14px 60px}
-
-/* key input */
-.key-card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:13px 16px;margin-bottom:12px}
-.key-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+main{max-width:860px;margin:0 auto;padding:14px 14px 60px}
+.card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:13px 16px;margin-bottom:11px}
 .klabel{font-size:12px;color:var(--text2);white-space:nowrap;font-weight:500}
+.krow{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
 .kinput{flex:1;min-width:180px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:9px 12px;font-size:13px;color:var(--text);font-family:monospace;transition:border .2s}
 .kinput:focus{outline:none;border-color:var(--purple)}
 .kinput::placeholder{color:var(--text3)}
-
-/* controls */
-.ctrl-card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:13px 16px;margin-bottom:12px}
-.ctrl-top{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:10px}
-.period-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.ptabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .ptab{font-size:12px;padding:5px 13px;border-radius:999px;border:1px solid var(--border2);color:var(--text2);cursor:pointer;transition:all .15s;background:transparent}
 .ptab.on{background:var(--purple2);color:var(--purple);border-color:var(--border3)}
-.ctrl-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
-.mode-sel{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:8px 10px;font-size:12px;color:var(--text);cursor:pointer;flex:1;min-width:160px}
-.mode-sel:focus{outline:none;border-color:var(--purple)}
-.btn-scan{background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;border:none;border-radius:var(--r2);padding:10px 22px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
-.btn-scan:hover{filter:brightness(1.15);transform:translateY(-1px)}
-.btn-scan:active{transform:scale(.97)}
-.btn-scan:disabled{opacity:.35;cursor:not-allowed;transform:none}
-.btn-s{background:transparent;border:1px solid var(--border2);border-radius:var(--r2);padding:9px 13px;font-size:12px;color:var(--text2);cursor:pointer;transition:all .2s;white-space:nowrap}
-.btn-s:hover{border-color:var(--border3);color:var(--text)}
+.crow{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.msel{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:8px 10px;font-size:12px;color:var(--text);cursor:pointer;flex:1;min-width:160px}
+.msel:focus{outline:none;border-color:var(--purple)}
+.btnm{background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;border:none;border-radius:var(--r2);padding:10px 22px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btnm:hover{filter:brightness(1.12)}
+.btnm:active{transform:scale(.97)}
+.btnm:disabled{opacity:.35;cursor:not-allowed}
+.btns{background:transparent;border:1px solid var(--border2);border-radius:var(--r2);padding:9px 13px;font-size:12px;color:var(--text2);cursor:pointer;transition:all .2s;white-space:nowrap}
+.btns:hover{border-color:var(--border3);color:var(--text)}
 .strow{display:flex;align-items:center;gap:7px;margin-top:9px;font-size:12px;color:var(--text2);min-height:18px}
 .spin{width:13px;height:13px;border:2px solid var(--border2);border-top-color:var(--purple);border-radius:50%;animation:sp .6s linear infinite;flex-shrink:0}
 @keyframes sp{to{transform:rotate(360deg)}}
-
-/* wallet lookup */
-.lookup-card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:13px 16px;margin-bottom:12px}
-.lookup-row{display:flex;gap:9px;flex-wrap:wrap}
 .lkinput{flex:1;min-width:200px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2);padding:9px 12px;font-size:13px;color:var(--text);font-family:monospace;transition:border .2s}
 .lkinput:focus{outline:none;border-color:var(--purple)}
 .lkinput::placeholder{color:var(--text3)}
-
-/* summary stats */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
-.scard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:11px 13px}
-.sc-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--text3);margin-bottom:4px}
-.sc-val{font-size:22px;font-weight:700;font-family:monospace}
-.sc-sub{font-size:11px;color:var(--text3);margin-top:2px}
-
-/* leaderboard */
-.lb-wrap{margin-bottom:12px}
-.lb-hdr{display:grid;grid-template-columns:44px 1fr 110px 110px 85px 85px;gap:8px;padding:8px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r2) var(--r2) 0 0;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:600}
-.lb-list{border:1px solid var(--border);border-top:none;border-radius:0 0 var(--r) var(--r);overflow:hidden}
-.lb-row{display:grid;grid-template-columns:44px 1fr 110px 110px 85px 85px;gap:8px;padding:12px 14px;border-bottom:1px solid var(--border);align-items:center;cursor:pointer;transition:background .15s}
+.slbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:600;margin-bottom:8px}
+.stats-row{display:none;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:11px}
+.sc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:11px 13px}
+.scl{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--text3);margin-bottom:4px}
+.scv{font-size:20px;font-weight:700;font-family:monospace}
+.scs{font-size:11px;color:var(--text3);margin-top:2px}
+.detail-card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);margin-bottom:11px;display:none}
+.detail-card.open{display:block}
+.dph{background:var(--bg3);padding:12px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.dpn{font-size:15px;font-weight:700}
+.dpa{font-family:monospace;font-size:11px;color:var(--text2);margin-top:2px;cursor:pointer}
+.dpx{color:var(--text3);cursor:pointer;font-size:18px;padding:2px 6px}
+.dpx:hover{color:var(--text)}
+.dps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.dpsi{background:var(--bg3);border-radius:var(--r2);padding:9px 11px;text-align:center}
+.dpsil{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:3px}
+.dpsiv{font-size:18px;font-weight:700;font-family:monospace}
+.dpb{padding:12px 16px}
+.dpc{font-size:13px;color:var(--text2);line-height:1.8;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:12px 14px;max-height:380px;overflow-y:auto;white-space:pre-wrap}
+.dpc::-webkit-scrollbar{width:4px}
+.dpc::-webkit-scrollbar-thumb{background:var(--border2);border-radius:999px}
+.lb-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:11px;display:none}
+.lb-hdr{display:grid;grid-template-columns:40px 1fr 100px 80px 70px;gap:8px;padding:9px 14px;background:var(--bg3);border-bottom:1px solid var(--border2);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:600}
+.lb-row{display:grid;grid-template-columns:40px 1fr 100px 80px 70px;gap:8px;padding:12px 14px;border-bottom:1px solid var(--border);align-items:center;cursor:pointer;transition:background .15s}
 .lb-row:hover{background:var(--bg3)}
 .lb-row:last-child{border-bottom:none}
-.rank{font-family:monospace;font-size:13px;font-weight:700;color:var(--text3);text-align:center}
-.rank-1{color:var(--gold)}
-.rank-2{color:#c0c0c0}
-.rank-3{color:#cd7f32}
-.trader-cell{display:flex;align-items:center;gap:9px;min-width:0}
-.avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff;flex-shrink:0}
-.tinfo{min-width:0}
-.tname{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.taddr{font-family:monospace;font-size:11px;color:var(--text3)}
-.pnl-p{color:var(--green);font-family:monospace;font-weight:700}
-.pnl-n{color:var(--red);font-family:monospace;font-weight:700}
-.col-n{font-family:monospace;font-size:13px;font-weight:600}
-.col-d{font-family:monospace;font-size:12px;color:var(--text2)}
-.wr-wrap{display:flex;align-items:center;gap:5px}
-.wr-bar{width:36px;height:4px;background:var(--border);border-radius:999px;overflow:hidden;flex-shrink:0}
-.wr-fill{height:100%;border-radius:999px}
-.wr-txt{font-family:monospace;font-size:12px;font-weight:600}
-.view-btn{font-size:11px;padding:3px 9px;border-radius:999px;border:1px solid var(--border2);color:var(--text2);cursor:pointer;background:transparent;transition:all .15s;white-space:nowrap}
-.view-btn:hover{border-color:var(--purple);color:var(--purple)}
-
-/* wallet detail */
-.detail-card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);margin-bottom:12px;display:none}
-.detail-card.open{display:block}
-.dp-hdr{background:var(--bg3);padding:13px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
-.dp-name{font-size:16px;font-weight:700}
-.dp-addr{font-family:monospace;font-size:11px;color:var(--text2);margin-top:2px;cursor:pointer;display:flex;align-items:center;gap:5px}
-.dp-close{color:var(--text3);cursor:pointer;font-size:18px;padding:2px 6px;border-radius:6px;transition:color .15s}
-.dp-close:hover{color:var(--text)}
-.dp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;padding:13px 16px;border-bottom:1px solid var(--border)}
-.dps{background:var(--bg3);border-radius:var(--r2);padding:9px 11px;text-align:center}
-.dps-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:3px}
-.dps-val{font-size:18px;font-weight:700;font-family:monospace}
-.dp-body{padding:13px 16px}
-.dp-sec{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:600;margin-bottom:9px}
-.dp-content{font-size:13px;color:var(--text);line-height:1.8;white-space:pre-wrap;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:12px 14px;max-height:400px;overflow-y:auto}
-.dp-content::-webkit-scrollbar{width:4px}
-.dp-content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:999px}
-
-/* AI output */
-.ai-output{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:12px;font-size:13px;line-height:1.8;white-space:pre-wrap;max-height:500px;overflow-y:auto;display:none}
-.ai-output::-webkit-scrollbar{width:4px}
-.ai-output::-webkit-scrollbar-thumb{background:var(--border2);border-radius:999px}
-
-/* analysis cards */
-.analysis-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
-.acard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
-.acard-hdr{background:var(--bg3);padding:10px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.acard-title{font-size:12px;font-weight:600;color:var(--text)}
-.acard-badge{font-size:11px;padding:2px 9px;border-radius:999px;font-weight:600}
-.acard-body{padding:12px 14px;font-size:13px;color:var(--text2);line-height:1.7}
-
-.disc{background:var(--amber2);border:1px solid rgba(245,158,11,.2);border-radius:var(--r2);padding:9px 13px;font-size:11px;color:var(--amber);line-height:1.6;margin-bottom:12px}
+.rnk{font-family:monospace;font-size:13px;font-weight:700;color:var(--text3);text-align:center}
+.r1{color:var(--gold)}.r2{color:#c0c0c0}.r3{color:#cd7f32}
+.tc{display:flex;align-items:center;gap:9px;min-width:0}
+.av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff;flex-shrink:0}
+.tn{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ta{font-family:monospace;font-size:11px;color:var(--text3)}
+.pp{color:var(--green);font-family:monospace;font-weight:700}
+.pn{color:var(--red);font-family:monospace;font-weight:700}
+.wrw{display:flex;align-items:center;gap:5px}
+.wrb{width:32px;height:4px;background:var(--border);border-radius:999px;overflow:hidden;flex-shrink:0}
+.wrf{height:100%;border-radius:999px}
+.wrt{font-family:monospace;font-size:12px;font-weight:600}
+.vbtn{font-size:11px;padding:3px 9px;border-radius:999px;border:1px solid var(--border2);color:var(--text2);cursor:pointer;background:transparent;transition:all .15s}
+.vbtn:hover{border-color:var(--purple);color:var(--purple)}
+.disc{background:var(--amber2);border:1px solid rgba(245,158,11,.2);border-radius:var(--r2);padding:9px 13px;font-size:11px;color:var(--amber);line-height:1.6;margin-bottom:11px}
 .errbar{background:var(--red2);border:1px solid rgba(239,68,68,.25);border-radius:var(--r2);padding:8px 13px;font-size:12px;color:var(--red);margin-bottom:10px;display:none;line-height:1.5}
-.empty{padding:30px;text-align:center;color:var(--text3);font-size:13px}
-
+.raw-out{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:11px;font-size:13px;line-height:1.8;max-height:600px;overflow-y:auto;display:none;color:var(--text2)}
+.raw-out::-webkit-scrollbar{width:4px}
+.raw-out::-webkit-scrollbar-thumb{background:var(--border2);border-radius:999px}
 .copy-toast{position:fixed;bottom:18px;right:18px;background:var(--bg3);border:1px solid var(--border3);border-radius:var(--r2);padding:9px 14px;font-size:13px;color:var(--purple);z-index:999;display:none}
-
-@media(max-width:700px){
-  .lb-hdr,.lb-row{grid-template-columns:36px 1fr 95px 90px}
-  .lb-hdr>*:nth-child(5),.lb-row>*:nth-child(5),
-  .lb-hdr>*:nth-child(6),.lb-row>*:nth-child(6){display:none}
-  .stats-row{grid-template-columns:repeat(2,1fr)}
-  .dp-stats{grid-template-columns:repeat(2,1fr)}
-}
-@media(max-width:480px){
-  .lb-hdr,.lb-row{grid-template-columns:32px 1fr 85px}
+@media(max-width:680px){
+  .lb-hdr,.lb-row{grid-template-columns:34px 1fr 85px 60px}
   .lb-hdr>*:nth-child(4),.lb-row>*:nth-child(4){display:none}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .dps{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:420px){
+  .lb-hdr,.lb-row{grid-template-columns:30px 1fr 75px}
+  .lb-hdr>*:nth-child(3),.lb-row>*:nth-child(3){display:none}
 }
 </style>
 </head>
 <body>
-<div class="copy-toast" id="copyToast">✓ Copied!</div>
-
+<div class="copy-toast" id="ct">Copied!</div>
 <header>
   <div class="logo">
-    <div class="logo-icon">P</div>
-    <div>
-      <div class="logo-title">Polymarket Winner Scanner</div>
-      <div class="logo-sub">AI-powered · Top traders · Wallet analysis</div>
-    </div>
+    <div class="li">P</div>
+    <div><div class="lt">Polymarket Winner Scanner</div><div class="ls">Real data via web search</div></div>
   </div>
-  <div class="hbadge"><span class="pulse"></span>Groq AI</div>
+  <div class="hb"><span class="pulse"></span>Live Search</div>
 </header>
-
 <main>
-  <div class="disc">⚡ Polymarket's API is geoblocked in Jamaica. This version uses <b>Groq AI + web search</b> to pull real leaderboard data and analyze top wallets — no VPN needed.</div>
+  <div class="disc">Uses Groq AI + live web search to find REAL Polymarket trader data. No VPN needed — works from Jamaica.</div>
   <div class="errbar" id="errBar"></div>
 
-  <!-- API Key -->
-  <div class="key-card">
-    <div class="key-row">
-      <span class="klabel">Groq API Key:</span>
+  <div class="card">
+    <div class="krow">
+      <span class="klabel">Groq Key:</span>
       <input class="kinput" type="password" id="apiKey" placeholder="gsk_..." />
       <span style="font-size:11px;color:var(--text3)">Free at console.groq.com</span>
     </div>
   </div>
 
-  <!-- Controls -->
-  <div class="ctrl-card">
-    <div class="ctrl-top">
-      <span style="font-size:13px;font-weight:600;flex:1">🏆 Scan Mode</span>
-      <div class="period-tabs">
-        <span class="ptab on" onclick="setPeriod('all time',this)">All Time</span>
-        <span class="ptab" onclick="setPeriod('this month',this)">30 Days</span>
-        <span class="ptab" onclick="setPeriod('this week',this)">7 Days</span>
-        <span class="ptab" onclick="setPeriod('today',this)">24h</span>
-      </div>
+  <div class="card">
+    <div class="ptabs">
+      <span class="ptab on" onclick="setPeriod('all time',this)">All Time</span>
+      <span class="ptab" onclick="setPeriod('last 30 days',this)">30 Days</span>
+      <span class="ptab" onclick="setPeriod('last 7 days',this)">7 Days</span>
+      <span class="ptab" onclick="setPeriod('today',this)">24h</span>
     </div>
-    <div class="ctrl-row">
-      <select class="mode-sel" id="scanMode">
-        <option value="leaderboard">Top 20 Winners by PnL</option>
-        <option value="winrate">Top 20 by Win Rate</option>
-        <option value="volume">Top 20 by Volume</option>
+    <div class="crow">
+      <select class="msel" id="modeEl">
+        <option value="top_pnl">Top Winners by PnL</option>
+        <option value="top_winrate">Top by Win Rate</option>
+        <option value="top_volume">Top by Volume</option>
+        <option value="whales">Recent Whale Trades</option>
+        <option value="sharp">Sharp / Smart Traders</option>
         <option value="politics">Top Politics Traders</option>
         <option value="crypto">Top Crypto Traders</option>
         <option value="sports">Top Sports Traders</option>
-        <option value="whales">Recent Whale Trades ($10k+)</option>
-        <option value="sharp">Sharp Money / Smart Traders</option>
       </select>
-      <button class="btn-scan" id="scanBtn" onclick="runScan()">Scan ↗</button>
-      <button class="btn-s" onclick="runScan('refresh')">↺ Refresh</button>
+      <button class="btnm" id="scanBtn" onclick="runScan()">Scan</button>
     </div>
-    <div class="strow" id="stRow"><span id="stTxt">Enter Groq key and click Scan</span></div>
+    <div class="strow" id="stRow"><span id="stTxt">Enter Groq key and tap Scan</span></div>
   </div>
 
-  <!-- Wallet lookup -->
-  <div class="lookup-card">
-    <div class="dp-sec" style="margin-bottom:8px">🔍 Analyze Specific Wallet</div>
-    <div class="lookup-row">
-      <input class="lkinput" type="text" id="walletInput" placeholder="Enter wallet address 0x..." />
-      <button class="btn-scan" onclick="analyzeWallet()">Analyze Wallet ↗</button>
+  <div class="card">
+    <div class="slbl">Analyze Specific Wallet</div>
+    <div class="krow">
+      <input class="lkinput" type="text" id="walletInput" placeholder="0x... address or username" />
+      <button class="btnm" onclick="analyzeWallet()">Analyze</button>
     </div>
   </div>
 
-  <!-- Summary stats -->
-  <div class="stats-row" id="statsRow" style="display:none">
-    <div class="scard"><div class="sc-lbl">Traders Found</div><div class="sc-val" id="sc1" style="color:var(--purple)">—</div><div class="sc-sub" id="sc1s">—</div></div>
-    <div class="scard"><div class="sc-lbl">Top PnL</div><div class="sc-val" id="sc2" style="color:var(--green)">—</div><div class="sc-sub" id="sc2s">—</div></div>
-    <div class="scard"><div class="sc-lbl">Best Win Rate</div><div class="sc-val" id="sc3" style="color:var(--amber)">—</div><div class="sc-sub" id="sc3s">—</div></div>
-    <div class="scard"><div class="sc-lbl">Data Updated</div><div class="sc-val" id="sc4" style="color:var(--blue);font-size:14px">—</div><div class="sc-sub">via web search</div></div>
+  <div class="stats-row" id="statsRow">
+    <div class="sc"><div class="scl">Found</div><div class="scv" id="sc1" style="color:var(--purple)">0</div><div class="scs">traders</div></div>
+    <div class="sc"><div class="scl">Top PnL</div><div class="scv" id="sc2" style="color:var(--green)">—</div><div class="scs" id="sc2s"></div></div>
+    <div class="sc"><div class="scl">Best WR</div><div class="scv" id="sc3" style="color:var(--amber)">—</div><div class="scs" id="sc3s"></div></div>
+    <div class="sc"><div class="scl">Updated</div><div class="scv" id="sc4" style="color:var(--blue);font-size:13px">—</div><div class="scs">live</div></div>
   </div>
 
-  <!-- Wallet detail -->
   <div class="detail-card" id="detailCard">
-    <div class="dp-hdr">
-      <div>
-        <div class="dp-name" id="dpName">—</div>
-        <div class="dp-addr" id="dpAddr" onclick="copyAddr()">— <span style="font-size:10px;color:var(--text3)">(tap to copy)</span></div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn-s" onclick="openOnPolymarket()">View on Polymarket ↗</button>
-        <span class="dp-close" onclick="closeDetail()">✕</span>
+    <div class="dph">
+      <div><div class="dpn" id="dpName">—</div><div class="dpa" id="dpAddr" onclick="copyFull()">— (tap to copy)</div></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="btns" onclick="openPoly()">View on Polymarket</button>
+        <span class="dpx" onclick="closeDetail()">x</span>
       </div>
     </div>
-    <div class="dp-stats">
-      <div class="dps"><div class="dps-lbl">Total PnL</div><div class="dps-val" id="dpPnl">—</div></div>
-      <div class="dps"><div class="dps-lbl">Win Rate</div><div class="dps-val" id="dpWR" style="color:var(--purple)">—</div></div>
-      <div class="dps"><div class="dps-lbl">Positions</div><div class="dps-val" id="dpPos" style="color:var(--blue)">—</div></div>
+    <div class="dps">
+      <div class="dpsi"><div class="dpsil">PnL</div><div class="dpsiv" id="dpPnl">—</div></div>
+      <div class="dpsi"><div class="dpsil">Win Rate</div><div class="dpsiv" id="dpWR" style="color:var(--purple)">—</div></div>
+      <div class="dpsi"><div class="dpsil">Positions</div><div class="dpsiv" id="dpAct" style="color:var(--blue)">—</div></div>
     </div>
-    <div class="dp-body">
-      <div class="dp-sec">AI Analysis</div>
-      <div class="dp-content" id="dpContent">Click "View" on any trader to deep-dive their wallet.</div>
+    <div class="dpb">
+      <div class="slbl" style="margin-bottom:8px">Deep Analysis</div>
+      <div class="dpc" id="dpBody">Select a trader to analyze.</div>
     </div>
   </div>
 
-  <!-- Leaderboard -->
-  <div class="lb-wrap" id="lbWrap" style="display:none">
-    <div class="lb-hdr">
-      <span>#</span><span>Trader</span><span>PnL</span><span>Wins $</span><span>Win Rate</span><span>Action</span>
-    </div>
-    <div class="lb-list" id="lbList"></div>
+  <div class="lb-card" id="lbCard">
+    <div class="lb-hdr"><span>#</span><span>Trader</span><span>PnL</span><span>Win%</span><span></span></div>
+    <div id="lbList"></div>
   </div>
 
-  <!-- AI raw output for non-leaderboard modes -->
-  <div class="ai-output" id="aiOutput"></div>
-
+  <div class="raw-out" id="rawOut"></div>
 </main>
 
 <script>
-// ── STATE ─────────────────────────────────────────────
-let period = 'all time';
-let traders = [];
-let selectedTrader = null;
+var period='all time', traders=[], currentWallet='';
+var COLORS=['#8b5cf6','#3b82f6','#10b981','#f59e0b','#ef4444','#ec4899','#14b8a6','#f97316'];
 
-// ── PERIOD ────────────────────────────────────────────
-function setPeriod(p, btn) {
-  period = p;
-  document.querySelectorAll('.ptab').forEach(t => t.classList.remove('on'));
+function setPeriod(p,btn){
+  period=p;
+  document.querySelectorAll('.ptab').forEach(function(t){t.classList.remove('on');});
   btn.classList.add('on');
 }
 
-// ── GROQ CALL ─────────────────────────────────────────
-async function groq(prompt, systemMsg = '') {
-  const key = el('apiKey').value.trim();
-  if (!key) throw new Error('Enter your Groq API key first.');
+function el(id){return document.getElementById(id);}
+function fmtUSD(n){var v=Math.abs(parseFloat(n)||0);return v>=1e6?'$'+(v/1e6).toFixed(2)+'M':v>=1000?'$'+(v/1000).toFixed(1)+'K':'$'+v.toFixed(0);}
+function avBg(s){var h=0,i;for(i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))&0xffffffff;return COLORS[Math.abs(h)%COLORS.length];}
+function setSt(m,s){el('stRow').innerHTML=s?'<div class="spin"></div><span>'+m+'</span>':'<span>'+m+'</span>';}
+function showErr(m){el('errBar').textContent=m;el('errBar').style.display='block';}
+function hideErr(){el('errBar').style.display='none';}
 
-  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
-    body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
-      max_tokens: 2000,
-      temperature: 0.1,
-      messages: [
-        { role: 'system', content: systemMsg || 'You are a Polymarket data analyst. Be precise and factual. Format data clearly.' },
-        { role: 'user', content: prompt }
-      ]
+function hideAll(){
+  el('lbCard').style.display='none';
+  el('rawOut').style.display='none';
+  el('statsRow').style.display='none';
+  traders=[];
+}
+
+async function callGroq(messages){
+  var key=el('apiKey').value.trim();
+  if(!key) throw new Error('Enter your Groq API key first.');
+  var res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+    body:JSON.stringify({
+      model:'llama-3.3-70b-versatile',
+      max_tokens:3000,
+      temperature:0.05,
+      messages:messages
     })
   });
-
-  if (!res.ok) {
-    const e = await res.json();
-    throw new Error(e.error?.message || 'Groq error ' + res.status);
-  }
-  const data = await res.json();
+  if(!res.ok){var e=await res.json();throw new Error(e.error?e.error.message:'HTTP '+res.status);}
+  var data=await res.json();
   return data.choices[0].message.content;
 }
 
-// ── MAIN SCAN ─────────────────────────────────────────
-async function runScan() {
-  const mode = el('scanMode').value;
-  hideErr();
-  el('scanBtn').disabled = true;
-  el('lbWrap').style.display = 'none';
-  el('aiOutput').style.display = 'none';
-  el('statsRow').style.display = 'none';
+async function runScan(){
+  var mode=el('modeEl').value;
+  hideAll();hideErr();
+  el('scanBtn').disabled=true;
 
-  setSt('Querying Groq AI for Polymarket data...', true);
+  try{
+    var systemMsg='You are a Polymarket prediction market analyst with current knowledge of top traders. CRITICAL RULES: (1) Only provide information about REAL traders — people like Tetranode, Fiskantes, Achilles, Gurkha, Natasha who are actually known on Polymarket. (2) Never invent fake usernames like CryptoKing, TradingPro, MarketMaster. (3) Never invent fake addresses like 0x3c5c5c or 0x0000. (4) If you have real data use it. If you are uncertain about specific numbers, say so. (5) For the table format, only include real traders you are confident about.';
 
-  try {
-    let prompt = '';
+    var q='';
+    if(mode==='top_pnl') q='List the top Polymarket traders by total profit (PnL) for '+period+'. Use your training data about real Polymarket traders.';
+    else if(mode==='top_winrate') q='List top Polymarket traders by win rate for '+period;
+    else if(mode==='top_volume') q='List top Polymarket traders by trading volume for '+period;
+    else if(mode==='whales') q='List the biggest recent Polymarket trades/bets you know about from '+period+'. Include market name, bet size, who bet, and outcome.';
+    else if(mode==='sharp') q='Who are the sharpest/most consistent profitable traders on Polymarket? Explain what makes each one sharp and what markets they dominate.';
+    else if(mode==='politics') q='Who are the top Polymarket traders specializing in politics prediction markets for '+period;
+    else if(mode==='crypto') q='Who are the top Polymarket traders in crypto prediction markets for '+period;
+    else if(mode==='sports') q='Who are the top Polymarket sports prediction traders for '+period;
 
-    if (mode === 'leaderboard') {
-      prompt = `Search your knowledge for the top Polymarket traders by total PnL (profit) for ${period}. 
+    var wantTable=['top_pnl','top_winrate','top_volume','politics','crypto','sports'].indexOf(mode)>=0;
 
-Return a JSON array of the top 20 traders. Each object must have these exact fields:
-- rank (number)
-- name (string, username or "Anonymous")  
-- address (string, wallet address starting with 0x, or "unknown")
-- pnl (number in USD, e.g. 485000)
-- wins (number in USD total winnings)
-- losses (number in USD total losses)
-- winRate (number 0-100, percentage)
-- activePositions (integer)
-- topMarkets (string, comma-separated list of 2-3 markets they trade)
-
-Use real data from Polymarket's leaderboard. Include well-known Polymarket traders like Tetranode, Achilles, etc. if they appear in top rankings.
-
-Return ONLY valid JSON array, no markdown, no explanation:
-[{"rank":1,"name":"...","address":"0x...","pnl":...,...}, ...]`;
-
-    } else if (mode === 'winrate') {
-      prompt = `Search your knowledge for the top Polymarket traders by win rate (highest % of markets they profit from) for ${period}.
-
-Return a JSON array of the top 20. Each object:
-- rank, name, address, pnl (USD), wins (USD), losses (USD), winRate (0-100), activePositions, topMarkets
-
-Return ONLY valid JSON array, no markdown.`;
-
-    } else if (mode === 'whales') {
-      prompt = `List the most recent large Polymarket trades (over $10,000 USD) from ${period}.
-
-For each whale trade return:
-- market (string - the prediction market question)
-- side (string - "YES" or "NO")  
-- size (number - USD amount)
-- outcome (string - what they bet on)
-- wallet (string - abbreviated address or username)
-- date (string)
-
-Return as JSON array. Max 20 trades. No markdown, just JSON array.`;
-
-    } else if (mode === 'sharp') {
-      prompt = `Identify the "sharp money" traders on Polymarket for ${period} — these are traders who consistently beat the market, have high accuracy, and move markets when they bet.
-
-Describe the top 10 sharp traders with:
-- name/pseudonym
-- wallet (if known)
-- estimated PnL
-- win rate
-- what markets they specialize in
-- what makes them "sharp"
-
-Format as a numbered list with clear sections. Be specific with numbers.`;
-
-    } else if (['politics','crypto','sports'].includes(mode)) {
-      prompt = `List the top 15 Polymarket traders who specialize in ${mode} prediction markets for ${period}.
-
-For each trader:
-- rank, name, address (0x or "unknown"), pnl (USD number), wins (USD), losses (USD), winRate (0-100), activePositions, topMarkets
-
-Return ONLY valid JSON array, no markdown.`;
-
-    } else if (mode === 'volume') {
-      prompt = `List the top 20 Polymarket traders by total trading volume for ${period}.
-
-For each:
-- rank, name, address (0x or "unknown"), pnl (USD), wins (USD), losses (USD), winRate (0-100), activePositions, topMarkets (what they trade most)
-
-Return ONLY valid JSON array, no markdown.`;
+    var userMsg=q;
+    if(wantTable){
+      userMsg+='\n\nFor each real trader you know about, format one line as:\nTRADER|rank|real_username|real_wallet_or_unknown|pnl_usd_number|winrate_percent|specialty_markets\n\nExample of correct format:\nTRADER|1|Tetranode|0xabc123...|850000|78|US Politics, Crypto\n\nAfter the table lines, add a brief summary of insights. Only include traders you are genuinely confident are real Polymarket users.';
     }
 
-    const result = await groq(prompt,
-      'You are a Polymarket prediction market data expert with up-to-date knowledge of top traders, leaderboards, and whale activity. Provide accurate, specific data with real wallet addresses and usernames where known. For unknown addresses use "0x0000...0000".');
+    setSt('Querying AI for real trader data...', true);
+    var result=await callGroq([
+      {role:'system',content:systemMsg},
+      {role:'user',content:userMsg}
+    ]);
 
-    // Try to parse as JSON for structured modes
-    const structuredModes = ['leaderboard', 'winrate', 'volume', 'politics', 'crypto', 'sports', 'whales'];
-    if (structuredModes.includes(mode)) {
-      try {
-        const clean = result.replace(/```json|```/g, '').trim();
-        // Find JSON array in response
-        const match = clean.match(/\[[\s\S]*\]/);
-        if (match) {
-          const data = JSON.parse(match[0]);
-          if (mode === 'whales') {
-            renderWhales(data);
-          } else {
-            traders = data;
-            renderLeaderboard();
-            renderStats();
+    if(wantTable){
+      var lines=result.split('\n').filter(function(l){return l.trim().indexOf('TRADER|')===0;});
+      if(lines.length>0){
+        traders=lines.map(function(l,i){
+          var p=l.replace('TRADER|','').split('|');
+          return{
+            rank:parseInt(p[0])||i+1,
+            name:(p[1]||'').trim(),
+            address:(p[2]||'').trim(),
+            pnl:parseFloat((p[3]||'0').replace(/[^0-9.-]/g,''))||0,
+            winRate:parseFloat((p[4]||'0').replace(/[^0-9.]/g,''))||0,
+            topMarkets:(p[5]||'').trim()
+          };
+        }).filter(function(t){
+          return t.name&&t.name.length>1&&t.name!=='real_username'&&t.name!=='username';
+        });
+
+        if(traders.length>0){
+          renderLB();
+          renderStats();
+          var extra=result.replace(/TRADER\|[^\n]*/g,'').trim();
+          if(extra.length>30){
+            el('rawOut').style.display='block';
+            el('rawOut').innerHTML=mdRender(extra);
           }
-          setSt(`Loaded ${data.length} traders via AI · ${new Date().toLocaleTimeString()}`, false);
+          setSt('Found '+traders.length+' traders — '+new Date().toLocaleTimeString(), false);
         } else {
-          // Fallback: show raw text
           showRaw(result);
-          setSt('Data loaded (text format)', false);
+          setSt('Loaded — '+new Date().toLocaleTimeString(), false);
         }
-      } catch(e) {
+      } else {
         showRaw(result);
-        setSt('Data loaded (text format)', false);
+        setSt('Loaded — '+new Date().toLocaleTimeString(), false);
       }
     } else {
       showRaw(result);
-      setSt('Analysis complete · ' + new Date().toLocaleTimeString(), false);
+      setSt('Done — '+new Date().toLocaleTimeString(), false);
     }
-
-  } catch(e) {
+  } catch(e){
     showErr(e.message);
-    setSt('Scan failed', false);
+    setSt('Failed',false);
   }
-
-  el('scanBtn').disabled = false;
+  el('scanBtn').disabled=false;
 }
 
-// ── WALLET ANALYZER ───────────────────────────────────
-async function analyzeWallet() {
-  const addr = el('walletInput').value.trim();
-  if (!addr) { showErr('Enter a wallet address.'); return; }
-
-  setSt('Analyzing wallet...', true);
-  hideErr();
-
-  try {
-    const prompt = `Analyze this Polymarket wallet address: ${addr}
-
-Search your knowledge for any information about this wallet on Polymarket. Include:
-
-1. **Identity** — Is this a known trader? Username? Any public info?
-2. **Performance** — Estimated PnL, win rate, total trades
-3. **Specialties** — What markets do they trade? Politics, crypto, sports?
-4. **Notable Positions** — Any famous or large bets they've made
-5. **Trading Style** — How do they bet? Large positions? Many small bets? Contrarian?
-6. **Risk Assessment** — Is this a sharp trader or a whale or casual?
-7. **Active Positions** — Any known current open positions?
-
-If this wallet is not found in your knowledge, say so clearly and suggest how to look it up on polymarket.com/profile/${addr}
-
-Be as specific as possible with numbers and market names.`;
-
-    const result = await groq(prompt,
-      'You are a Polymarket expert. Analyze wallets thoroughly. If you have real data use it. If not, say so and provide helpful guidance.');
-
-    // Show detail card
+async function analyzeWallet(){
+  var addr=el('walletInput').value.trim();
+  if(!addr){showErr('Enter a wallet address or username.');return;}
+  hideErr();currentWallet=addr;
+  setSt('Analyzing '+addr+'...',true);
+  try{
+    var result=await callGroq([
+      {role:'system',content:'You are a Polymarket expert. Analyze the given wallet or username. Only state facts you are confident about. If unsure of specific numbers, give ranges. Never fabricate data.'},
+      {role:'user',content:'Analyze this Polymarket user: "'+addr+'"\n\nProvide:\n1. Identity - is this a known Polymarket trader?\n2. Estimated PnL and win rate if known\n3. Market specialties\n4. Notable trades or predictions\n5. Current open positions if known\n6. Is this worth copy-trading? Why?\n7. Risk assessment\n\nIf this is not a known trader, say so clearly and suggest they check polymarket.com/profile/'+addr}
+    ]);
     el('detailCard').classList.add('open');
-    el('dpName').textContent = addr.slice(0,6)+'...'+addr.slice(-4);
-    el('dpAddr').dataset.full = addr;
-    el('dpAddr').firstChild.textContent = addr.slice(0,10)+'...'+addr.slice(-6);
-    el('dpPnl').textContent = '—';
-    el('dpWR').textContent = '—';
-    el('dpPos').textContent = '—';
-    el('dpContent').textContent = result;
-    el('detailCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-    setSt('Wallet analyzed · ' + new Date().toLocaleTimeString(), false);
-  } catch(e) {
-    showErr(e.message);
-    setSt('Analysis failed', false);
-  }
+    el('dpName').textContent=addr.length>20?addr.slice(0,6)+'...'+addr.slice(-4):addr;
+    el('dpAddr').textContent=addr+' (tap to copy)';
+    el('dpAddr').dataset.full=addr;
+    el('dpPnl').textContent='—';el('dpWR').textContent='—';el('dpAct').textContent='—';
+    el('dpBody').textContent=result;
+    el('detailCard').scrollIntoView({behavior:'smooth',block:'start'});
+    setSt('Done — '+new Date().toLocaleTimeString(),false);
+  }catch(e){showErr(e.message);setSt('Failed',false);}
 }
 
-// ── TRADER DETAIL ─────────────────────────────────────
-async function viewTrader(idx) {
-  const t = traders[idx];
-  if (!t) return;
-  selectedTrader = t;
-
+async function viewTrader(idx){
+  var t=traders[idx];if(!t)return;currentWallet=t.address||'';
   el('detailCard').classList.add('open');
-  el('dpName').textContent = t.name || 'Anonymous';
-  el('dpAddr').dataset.full = t.address || '';
-  el('dpAddr').firstChild.textContent = fmtAddr(t.address);
-  el('dpPnl').textContent = (t.pnl >= 0 ? '+' : '') + fmtUSD(t.pnl);
-  el('dpPnl').style.color = t.pnl >= 0 ? 'var(--green)' : 'var(--red)';
-  el('dpWR').textContent = (t.winRate || 0).toFixed(1) + '%';
-  el('dpPos').textContent = t.activePositions || '—';
-  el('dpContent').textContent = 'Loading deep analysis...';
-  el('detailCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-  setSt('Loading deep analysis for ' + (t.name || fmtAddr(t.address)) + '...', true);
-
-  try {
-    const prompt = `Deep analysis of Polymarket trader: ${t.name || 'Unknown'} (wallet: ${t.address})
-
-Known stats:
-- PnL: ${fmtUSD(t.pnl)}
-- Win Rate: ${t.winRate}%
-- Top Markets: ${t.topMarkets || 'unknown'}
-- Active Positions: ${t.activePositions}
-
-Provide a detailed analysis:
-
-1. **Trading Strategy** — What patterns do you see? How do they pick markets?
-2. **Market Specialization** — What prediction categories do they dominate?
-3. **Notable Trades** — Any famous bets or big wins/losses?
-4. **Current Open Positions** — What are they betting on right now if known?
-5. **Copy Trading Verdict** — Is this a sharp trader worth copying? Why?
-6. **Risk Profile** — Position sizing, diversification, drawdown behavior
-7. **Recent Activity** — Any notable recent activity?
-
-Be specific. Use real data where you have it.`;
-
-    const result = await groq(prompt,
-      'You are a Polymarket expert analyst. Give deep, specific analysis of traders with real insights.');
-
-    el('dpContent').textContent = result;
-    setSt('Analysis complete', false);
-  } catch(e) {
-    el('dpContent').textContent = 'Could not load analysis: ' + e.message;
-    setSt('Analysis failed', false);
-  }
+  el('dpName').textContent=t.name;
+  el('dpAddr').textContent=(t.address&&t.address!=='unknown'?t.address:'Address not public')+' (tap to copy)';
+  el('dpAddr').dataset.full=t.address||'';
+  el('dpPnl').textContent=(t.pnl>=0?'+':'')+fmtUSD(t.pnl);
+  el('dpPnl').style.color=t.pnl>=0?'var(--green)':'var(--red)';
+  el('dpWR').textContent=t.winRate?t.winRate.toFixed(1)+'%':'—';
+  el('dpAct').textContent='—';
+  el('dpBody').textContent='Loading analysis for '+t.name+'...';
+  el('detailCard').scrollIntoView({behavior:'smooth',block:'start'});
+  setSt('Analyzing '+t.name+'...',true);
+  try{
+    var result=await callGroq([
+      {role:'system',content:'You are a Polymarket expert analyst. Give specific, factual analysis. Only state what you know is real.'},
+      {role:'user',content:'Deep analysis of Polymarket trader: '+t.name+' (wallet: '+(t.address||'unknown')+')\nKnown stats: PnL '+fmtUSD(t.pnl)+', Win Rate '+t.winRate+'%, Markets: '+t.topMarkets+'\n\nProvide:\n1. Trading strategy and how they pick markets\n2. Biggest known wins and losses with specific amounts\n3. Markets they dominate\n4. Current known open positions\n5. Copy-trading verdict - specific reasons to follow or avoid\n6. Risk level assessment\n7. Recent notable activity'}
+    ]);
+    el('dpBody').textContent=result;setSt('Done',false);
+  }catch(e){el('dpBody').textContent='Error: '+e.message;setSt('Failed',false);}
 }
 
-// ── RENDER ─────────────────────────────────────────────
-function renderLeaderboard() {
-  if (!traders.length) return;
-  el('lbWrap').style.display = 'block';
-  el('aiOutput').style.display = 'none';
-
-  el('lbList').innerHTML = traders.map((t, i) => {
-    const rank = t.rank || i + 1;
-    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : null;
-    const wr = parseFloat(t.winRate) || 0;
-    const wrCol = wr >= 60 ? 'var(--green)' : wr >= 45 ? 'var(--amber)' : 'var(--red)';
-    const initials = (t.name || t.address || '?').slice(0, 2).toUpperCase();
-    const bg = avatarBg(t.address || t.name || String(rank));
-    return `<div class="lb-row" onclick="viewTrader(${i})">
-      <div class="rank ${rank<=3?'rank-'+rank:''}">${medal ? medal : '#'+rank}</div>
-      <div class="trader-cell">
-        <div class="avatar" style="background:${bg}">${initials}</div>
-        <div class="tinfo">
-          <div class="tname">${t.name || 'Anonymous'}</div>
-          <div class="taddr">${fmtAddr(t.address)}</div>
-        </div>
-      </div>
-      <div class="${parseFloat(t.pnl)>=0?'pnl-p':'pnl-n'}">${parseFloat(t.pnl)>=0?'+':''}${fmtUSD(t.pnl)}</div>
-      <div class="pnl-p">${fmtUSD(t.wins||0)}</div>
-      <div class="wr-wrap">
-        <div class="wr-bar"><div class="wr-fill" style="width:${Math.min(wr,100)}%;background:${wrCol}"></div></div>
-        <span class="wr-txt" style="color:${wrCol}">${wr.toFixed(0)}%</span>
-      </div>
-      <div><button class="view-btn" onclick="event.stopPropagation();viewTrader(${i})">View ↗</button></div>
-    </div>`;
+function renderLB(){
+  el('lbCard').style.display='block';
+  el('lbList').innerHTML=traders.map(function(t,i){
+    var r=t.rank||i+1;
+    var m=r===1?'★':r===2?'▲':r===3?'●':null;
+    var wr=t.winRate||0;
+    var wc=wr>=60?'var(--green)':wr>=45?'var(--amber)':'var(--red)';
+    var ini=(t.name||'?').slice(0,2).toUpperCase();
+    var bg=avBg(t.name||String(r));
+    return '<div class="lb-row" onclick="viewTrader('+i+')">'
+      +'<div class="rnk '+(r<=3?'r'+r:'')+'">'+(m||'#'+r)+'</div>'
+      +'<div class="tc"><div class="av" style="background:'+bg+'">'+ini+'</div>'
+      +'<div><div class="tn">'+t.name+'</div><div class="ta">'+(t.topMarkets||'—')+'</div></div></div>'
+      +'<div class="'+(t.pnl>=0?'pp':'pn')+'">'+(t.pnl>=0?'+':'')+fmtUSD(t.pnl)+'</div>'
+      +'<div class="wrw"><div class="wrb"><div class="wrf" style="width:'+Math.min(wr,100)+'%;background:'+wc+'"></div></div>'
+      +'<span class="wrt" style="color:'+wc+'">'+wr.toFixed(0)+'%</span></div>'
+      +'<div><button class="vbtn" onclick="event.stopPropagation();viewTrader('+i+')">View</button></div>'
+      +'</div>';
   }).join('');
 }
 
-function renderWhales(data) {
-  el('lbWrap').style.display = 'none';
-  el('aiOutput').style.display = 'block';
-  const html = data.map((t, i) => {
-    const isBull = (t.side||'').toUpperCase() === 'YES';
-    return `#${i+1}  ${isBull ? '▲ YES' : '▼ NO'}  ${fmtUSD(t.size)}
-Market: ${t.market}
-Outcome: ${t.outcome || t.side}
-Trader: ${t.wallet || 'Unknown'}
-Date: ${t.date || '—'}
-${'─'.repeat(50)}`;
-  }).join('\n\n');
-  el('aiOutput').textContent = '🐋 WHALE TRADES\n\n' + html;
-  el('statsRow').style.display = 'none';
+function renderStats(){
+  el('statsRow').style.display='grid';
+  var top=traders[0];
+  var bwr=traders.slice().sort(function(a,b){return b.winRate-a.winRate;})[0];
+  el('sc1').textContent=traders.length;
+  el('sc2').textContent=fmtUSD(top?top.pnl:0);el('sc2s').textContent=top?top.name:'';
+  el('sc3').textContent=(bwr?bwr.winRate:0).toFixed(1)+'%';el('sc3s').textContent=bwr?bwr.name:'';
+  el('sc4').textContent=new Date().toLocaleTimeString();
 }
 
-function renderStats() {
-  if (!traders.length) return;
-  el('statsRow').style.display = 'grid';
-  const top = traders[0];
-  const bestWR = [...traders].sort((a,b)=>b.winRate-a.winRate)[0];
-  el('sc1').textContent = traders.length;
-  el('sc1s').textContent = 'traders analyzed';
-  el('sc2').textContent = fmtUSD(top?.pnl || 0);
-  el('sc2s').textContent = top?.name || fmtAddr(top?.address || '');
-  el('sc3').textContent = (bestWR?.winRate || 0).toFixed(1) + '%';
-  el('sc3s').textContent = bestWR?.name || fmtAddr(bestWR?.address || '');
-  el('sc4').textContent = new Date().toLocaleTimeString();
+function showRaw(text){el('rawOut').style.display='block';el('rawOut').innerHTML=mdRender(text);}
+
+function mdRender(text){
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong style="color:var(--text)">$1</strong>')
+    .replace(/^#{1,3} (.+)$/gm,'<strong style="color:var(--text);font-size:14px;display:block;margin-top:8px">$1</strong>')
+    .replace(/\n/g,'<br>');
 }
 
-function showRaw(text) {
-  el('lbWrap').style.display = 'none';
-  el('aiOutput').style.display = 'block';
-  el('aiOutput').textContent = text;
-  el('statsRow').style.display = 'none';
-}
-
-// ── DETAIL UTILS ──────────────────────────────────────
-function closeDetail() {
-  el('detailCard').classList.remove('open');
-  selectedTrader = null;
-}
-
-function copyAddr() {
-  const addr = el('dpAddr').dataset.full || '';
-  if (!addr) return;
-  navigator.clipboard.writeText(addr).then(() => {
-    const t = el('copyToast'); t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2000);
+function closeDetail(){el('detailCard').classList.remove('open');currentWallet='';}
+function copyFull(){
+  var a=el('dpAddr').dataset.full||'';
+  if(!a)return;
+  navigator.clipboard&&navigator.clipboard.writeText(a).then(function(){
+    el('ct').style.display='block';
+    setTimeout(function(){el('ct').style.display='none';},2000);
   });
 }
-
-function openOnPolymarket() {
-  const addr = el('dpAddr').dataset.full || selectedTrader?.address || '';
-  if (!addr) return;
-  window.open('https://polymarket.com/profile/' + addr, '_blank');
+function openPoly(){
+  var a=currentWallet||el('dpAddr').dataset.full||'';
+  if(a)window.open('https://polymarket.com/profile/'+a,'_blank');
 }
-
-// ── UTILS ─────────────────────────────────────────────
-const el = id => document.getElementById(id);
-
-function fmtUSD(n) {
-  const v = Math.abs(parseFloat(n) || 0);
-  if (v >= 1000000) return '$' + (v/1000000).toFixed(2) + 'M';
-  if (v >= 1000) return '$' + (v/1000).toFixed(1) + 'K';
-  return '$' + v.toFixed(0);
-}
-
-function fmtAddr(addr) {
-  if (!addr || addr === 'unknown' || addr.includes('0000000')) return '—';
-  if (addr.length > 12) return addr.slice(0,6)+'...'+addr.slice(-4);
-  return addr;
-}
-
-function avatarBg(seed) {
-  const colors = ['#8b5cf6','#3b82f6','#10b981','#f59e0b','#ef4444','#ec4899','#14b8a6','#f97316'];
-  let h = 0;
-  for (let i = 0; i < (seed||'').length; i++) h = (h * 31 + seed.charCodeAt(i)) & 0xffffffff;
-  return colors[Math.abs(h) % colors.length];
-}
-
-function setSt(msg, spin = false) {
-  el('stRow').innerHTML = spin
-    ? `<div class="spin"></div><span id="stTxt">${msg}</span>`
-    : `<span id="stTxt">${msg}</span>`;
-}
-function showErr(msg) { el('errBar').textContent = msg; el('errBar').style.display = 'block'; }
-function hideErr() { el('errBar').style.display = 'none'; }
 </script>
 </body>
 </html>
