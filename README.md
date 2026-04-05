@@ -1,29 +1,27 @@
 # Polymarket Winner Scanner
 
-A free, no-login tool to scan and analyze the top winning wallets on Polymarket prediction markets.
+AI-powered Polymarket top trader scanner. Works from anywhere — no VPN needed.
+
+## How it works
+
+Uses **Groq AI (free)** to search for and analyze top Polymarket traders, wallets, and whale activity. Bypasses geoblocking since it queries AI instead of Polymarket's blocked API directly.
 
 ## Features
 
-- 🏆 **Top 50 Leaderboard** — ranked by PnL, win rate, volume, or active positions
-- ⏱ **Time filters** — All Time, 30 Days, 7 Days, 24 Hours
-- 🗂 **Category filters** — Politics, Crypto, Sports, Economics, Science, Culture
-- 🔍 **Wallet search** — look up any address directly
-- 📊 **Wallet deep dive** — open positions, recent trades, full stats
-- 🐋 **Whale feed** — live large trades across all markets
-- 📋 **Copy wallet** — one tap to copy any address
+- 🏆 Top 20 winners by PnL, win rate, or volume
+- 🗳 Category filters — Politics, Crypto, Sports
+- 🐋 Recent whale trades ($10k+)
+- 🔍 Analyze any wallet address
+- 📊 Deep trader analysis — strategy, positions, copy trading verdict
+- 🎯 Sharp money / smart trader identification
 
-## Usage
+## Setup
 
-Open the live site and click **Scan Top Winners**. No API key required — uses Polymarket's official public API.
-
-> **Note:** Polymarket may be geoblocked in some regions. If you get an error, use a VPN set to UK or Europe.
-
-## Stack
-
-- Pure HTML/CSS/JS — single file, no dependencies
-- Polymarket public Data API + Gamma API
-- Deployed via GitHub Pages
+1. Get a free Groq API key at **console.groq.com/keys**
+2. Open the live site
+3. Paste your Groq key
+4. Click **Scan** and choose your mode
 
 ## Live Site
 
-`https://yourusername.github.io/polymarket-scanner/`
+`https://kerrtheinfluencer.github.io/polymarket-scanner/`
