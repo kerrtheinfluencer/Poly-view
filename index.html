@@ -85,7 +85,7 @@
             flex-wrap: wrap;
         }
         
-        .api-status, .connection-status {
+        .connection-status {
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -97,8 +97,6 @@
             transition: all 0.3s;
         }
         
-        .api-status.configured { border-color: var(--success); color: var(--success); }
-        .api-status.unconfigured { border-color: var(--warning); color: var(--warning); cursor: pointer; }
         .connection-status.online { border-color: var(--success); color: var(--success); }
         .connection-status.offline { border-color: var(--warning); color: var(--warning); }
         
@@ -115,54 +113,6 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem 1.5rem;
-        }
-        
-        .api-setup {
-            background: var(--bg-secondary);
-            border: 1px solid rgba(124, 61, 255, 0.3);
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-        
-        .api-setup h2 {
-            margin-bottom: 1rem;
-            color: var(--accent-primary);
-        }
-        
-        .api-setup input {
-            width: 100%;
-            max-width: 400px;
-            padding: 0.75rem 1rem;
-            background: var(--bg-primary);
-            border: 1px solid rgba(124, 61, 255, 0.3);
-            border-radius: 8px;
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-            font-family: inherit;
-        }
-        
-        .api-setup button {
-            padding: 0.75rem 2rem;
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        
-        .api-setup button:hover { transform: translateY(-2px); }
-        
-        .quota-info {
-            display: flex;
-            gap: 2rem;
-            justify-content: center;
-            margin-top: 1rem;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
         }
         
         .search-section { margin-bottom: 2rem; }
@@ -523,9 +473,35 @@
         
         .hidden { display: none !important; }
         
+        .instance-selector {
+            background: var(--bg-secondary);
+            border: 1px solid rgba(124, 61, 255, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .instance-selector label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        .instance-selector select {
+            background: var(--bg-primary);
+            border: 1px solid rgba(124, 61, 255, 0.3);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-family: inherit;
+            cursor: pointer;
+        }
+        
         @media (max-width: 768px) {
             .content-grid { grid-template-columns: 1fr; }
-            .quota-info { flex-direction: column; gap: 0.5rem; }
             .header-content { flex-direction: column; align-items: flex-start; }
         }
     </style>
@@ -540,10 +516,6 @@
                 SonicVault
             </div>
             <div class="status-bar">
-                <div class="api-status unconfigured" id="apiStatus" onclick="showApiSetup()">
-                    <span class="status-dot"></span>
-                    <span id="apiStatusText">API Key Needed</span>
-                </div>
                 <div class="connection-status online" id="connectionStatus">
                     <span class="status-dot"></span>
                     <span id="statusText">Online</span>
@@ -553,29 +525,24 @@
     </header>
     
     <div class="container">
-        <div class="api-setup hidden" id="apiSetup">
-            <h2>🔑 YouTube API Configuration</h2>
-            <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">
-                To search YouTube videos, you need a YouTube Data API v3 key. 
-                <a href="https://console.cloud.google.com/apis/credentials" target="_blank" style="color: var(--accent-secondary);">Get one here</a>
-            </p>
-            <input type="password" id="apiKeyInput" placeholder="Enter your YouTube API Key...">
-            <br>
-            <button onclick="saveApiKey()">Save API Key</button>
-            <div class="quota-info">
-                <span>📊 Daily Quota: 10,000 units</span>
-                <span>🔍 Search cost: 100 units/request</span>
-                <span>📹 Video details: 1 unit/request</span>
-            </div>
-            <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-secondary);">
-                Your API key is stored locally in your browser and never sent to our servers.
-            </p>
+        <div class="instance-selector">
+            <label>🌐 Piped Instance:</label>
+            <select id="instanceSelect">
+                <option value="https://pipedapi.kavin.rocks">pipedapi.kavin.rocks (Default)</option>
+                <option value="https://api.piped.projectsegfault.com">projectsegfault.com</option>
+                <option value="https://pipedapi.moomoo.me">moomoo.me</option>
+                <option value="https://pipedapi.adminforge.de">adminforge.de</option>
+                <option value="https://api.piped.privacydev.net">privacydev.net</option>
+            </select>
+            <span style="color: var(--text-secondary); font-size: 0.875rem; margin-left: auto;">
+                No API key needed • Privacy-friendly
+            </span>
         </div>
         
         <section class="search-section">
             <div class="search-container">
-                <input type="text" class="search-input" id="searchInput" placeholder="Search for music on YouTube..." disabled>
-                <button class="search-btn" id="searchBtn" onclick="performSearch()" disabled>🔍</button>
+                <input type="text" class="search-input" id="searchInput" placeholder="Search for music...">
+                <button class="search-btn" id="searchBtn" onclick="performSearch()">🔍</button>
             </div>
         </section>
         
@@ -603,26 +570,21 @@
         // Configuration
         const DB_NAME = 'SonicVaultDB_v1';
         const DB_VERSION = 1;
-        const YOUTUBE_API_BASE = 'https://www.googleapis.com/youtube/v3';
-        const QUOTA_SEARCH_COST = 100;
-        const QUOTA_VIDEO_COST = 1;
-        const DAILY_QUOTA = 10000;
         
+        // Piped instances - these are public instances that provide CORS-friendly API
+        const PIPED_INSTANCES = [
+            'https://pipedapi.kavin.rocks',
+            'https://api.piped.projectsegfault.com',
+            'https://pipedapi.moomoo.me',
+            'https://pipedapi.adminforge.de',
+            'https://api.piped.privacydev.net'
+        ];
+        
+        let currentInstance = localStorage.getItem('pipedInstance') || PIPED_INSTANCES[0];
         let db;
-        let youtubeApiKey = localStorage.getItem('youtubeApiKey') || '';
         let currentTab = 'search';
         let searchResults = [];
         let savedSongs = [];
-        let quotaUsed = parseInt(localStorage.getItem('quotaUsed') || '0');
-        let quotaResetDate = localStorage.getItem('quotaResetDate') || new Date().toDateString();
-        
-        // Check quota reset
-        if (quotaResetDate !== new Date().toDateString()) {
-            quotaUsed = 0;
-            quotaResetDate = new Date().toDateString();
-            localStorage.setItem('quotaResetDate', quotaResetDate);
-            localStorage.setItem('quotaUsed', '0');
-        }
         
         // Initialize IndexedDB
         const initDB = () => {
@@ -643,78 +605,56 @@
             });
         };
         
-        // API Key Management
-        const showApiSetup = () => {
-            document.getElementById('apiSetup').classList.remove('hidden');
-        };
-        
-        const saveApiKey = () => {
-            const key = document.getElementById('apiKeyInput').value.trim();
-            if (!key) {
-                showToast('Please enter a valid API key', 'error');
-                return;
-            }
-            
-            youtubeApiKey = key;
-            localStorage.setItem('youtubeApiKey', key);
-            document.getElementById('apiSetup').classList.add('hidden');
-            updateApiStatus();
-            showToast('API Key saved successfully!', 'success');
-            
-            // Enable search
-            document.getElementById('searchInput').disabled = false;
-            document.getElementById('searchBtn').disabled = false;
-        };
-        
-        const updateApiStatus = () => {
-            const statusEl = document.getElementById('apiStatus');
-            const statusText = document.getElementById('apiStatusText');
-            
-            if (youtubeApiKey) {
-                statusEl.classList.remove('unconfigured');
-                statusEl.classList.add('configured');
-                statusEl.onclick = null;
-                statusText.textContent = 'API Ready';
-                document.getElementById('searchInput').disabled = false;
-                document.getElementById('searchBtn').disabled = false;
-            } else {
-                showApiSetup();
-            }
-        };
-        
-        // YouTube API Functions
-        const searchYouTube = async (query) => {
-            if (!youtubeApiKey) throw new Error('API key not configured');
-            
-            const remainingQuota = DAILY_QUOTA - quotaUsed;
-            if (remainingQuota < QUOTA_SEARCH_COST) {
-                throw new Error(`Daily quota exceeded. Resets at midnight PT. Used: ${quotaUsed}/${DAILY_QUOTA}`);
-            }
+        // Piped API Functions (No API key needed, CORS-friendly)
+        const searchPiped = async (query) => {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
             
             try {
                 const response = await fetch(
-                    `${YOUTUBE_API_BASE}/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=12&key=${youtubeApiKey}`
+                    `${currentInstance}/search?q=${encodeURIComponent(query)}&filter=music_songs`,
+                    {
+                        signal: controller.signal,
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    }
                 );
+                clearTimeout(timeoutId);
                 
                 if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error?.message || 'Search failed');
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
-                quotaUsed += QUOTA_SEARCH_COST;
-                localStorage.setItem('quotaUsed', quotaUsed.toString());
-                
                 const data = await response.json();
+                
+                // Transform Piped data to our format
                 return data.items.map(item => ({
-                    id: item.id.videoId,
-                    title: item.snippet.title,
-                    channel: item.snippet.channelTitle,
-                    thumbnail: item.snippet.thumbnails.medium?.url || item.snippet.thumbnails.default?.url,
-                    publishedAt: item.snippet.publishedAt
-                }));
+                    id: item.url.split('v=')[1] || item.url.split('/').pop(),
+                    title: item.title,
+                    channel: item.uploaderName,
+                    thumbnail: item.thumbnail,
+                    duration: item.duration,
+                    uploaded: item.uploaded,
+                    views: item.views
+                })).filter(item => item.id); // Only return items with valid IDs
             } catch (error) {
-                if (error.message.includes('quota')) throw error;
+                if (error.name === 'AbortError') {
+                    throw new Error('Search timed out. Try another instance.');
+                }
                 throw new Error('Search failed: ' + error.message);
+            }
+        };
+        
+        // Get video details from Piped
+        const getVideoDetails = async (videoId) => {
+            try {
+                const response = await fetch(`${currentInstance}/streams/${videoId}`);
+                if (!response.ok) throw new Error('Failed to fetch video details');
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching video details:', error);
+                return null;
             }
         };
         
@@ -782,14 +722,16 @@
             grid.innerHTML = videos.map(video => `
                 <div class="video-card" data-id="${video.id}">
                     <div class="video-thumbnail">
-                        <img src="${video.thumbnail}" alt="${escapeHtml(video.title)}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎵</text></svg>'">
+                        <img src="${video.thumbnail}" alt="${escapeHtml(video.title)}" loading="lazy" 
+                             onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%231a1a2e%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2250%22 font-size=%2240%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>🎵</text></svg>'">
                         <div class="play-overlay" onclick="playVideo('${video.id}')">
                             <div class="play-btn">▶</div>
                         </div>
+                        ${video.duration ? `<div style="position: absolute; bottom: 0.5rem; right: 0.5rem; background: rgba(0,0,0,0.8); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">${formatDuration(video.duration)}</div>` : ''}
                     </div>
                     <div class="video-info">
                         <div class="video-title">${escapeHtml(video.title)}</div>
-                        <div class="video-channel">${escapeHtml(video.channel)}</div>
+                        <div class="video-channel">${escapeHtml(video.channel)} ${video.views ? `• ${formatViews(video.views)} views` : ''}</div>
                         <div class="video-actions">
                             <button class="action-btn ${isSongSaved(video.id) ? 'saved btn-primary' : 'btn-secondary'}" 
                                     onclick="toggleSave('${video.id}', '${escapeHtml(video.title)}', '${escapeHtml(video.channel)}', '${video.thumbnail}')"
@@ -805,6 +747,18 @@
             `).join('');
         };
         
+        const formatDuration = (seconds) => {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        };
+        
+        const formatViews = (views) => {
+            if (views >= 1000000) return (views / 1000000).toFixed(1) + 'M';
+            if (views >= 1000) return (views / 1000).toFixed(1) + 'K';
+            return views.toString();
+        };
+        
         const escapeHtml = (text) => {
             const div = document.createElement('div');
             div.textContent = text;
@@ -814,12 +768,6 @@
         const performSearch = async () => {
             const query = document.getElementById('searchInput').value.trim();
             if (!query) return;
-            
-            if (!youtubeApiKey) {
-                showToast('Please configure your YouTube API key first', 'warning');
-                showApiSetup();
-                return;
-            }
             
             const grid = document.getElementById('videoGrid');
             grid.innerHTML = '<div class="spinner"></div>';
@@ -832,8 +780,12 @@
                     return;
                 }
                 
-                searchResults = await searchYouTube(query);
+                searchResults = await searchPiped(query);
                 renderVideos(searchResults);
+                
+                if (searchResults.length === 0) {
+                    showToast('No results found. Try a different search term.', 'warning');
+                }
             } catch (error) {
                 showToast(error.message, 'error');
                 grid.innerHTML = `
@@ -841,6 +793,7 @@
                         <div class="empty-icon">⚠️</div>
                         <div class="empty-title">Search Failed</div>
                         <p>${escapeHtml(error.message)}</p>
+                        <button class="action-btn btn-primary" onclick="performSearch()" style="margin-top: 1rem;">Try Again</button>
                     </div>
                 `;
             }
@@ -862,7 +815,7 @@
                         <div class="empty-state">
                             <div class="empty-icon">🔍</div>
                             <div class="empty-title">Search for music</div>
-                            <p>Enter a song name above to find music on YouTube</p>
+                            <p>Enter a song name above to find music</p>
                         </div>
                     `;
                 }
@@ -892,16 +845,49 @@
             }
         };
         
-        window.playVideo = (videoId) => {
+        window.playVideo = async (videoId) => {
             const container = document.getElementById('videoContainer');
-            container.innerHTML = `
-                <iframe 
-                    src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen
-                    loading="lazy">
-                </iframe>
-            `;
+            
+            // Try to get Piped stream URL for better privacy
+            try {
+                const details = await getVideoDetails(videoId);
+                if (details && details.videoStreams && details.videoStreams.length > 0) {
+                    // Use Piped proxy for video playback (no ads, no tracking)
+                    const streamUrl = details.videoStreams[0].url;
+                    container.innerHTML = `
+                        <video 
+                            controls 
+                            autoplay 
+                            style="position: absolute; inset: 0; width: 100%; height: 100%;"
+                            poster="${details.thumbnailUrl}"
+                        >
+                            <source src="${streamUrl}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    `;
+                } else {
+                    // Fallback to YouTube embed
+                    container.innerHTML = `
+                        <iframe 
+                            src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen
+                            loading="lazy">
+                        </iframe>
+                    `;
+                }
+            } catch (error) {
+                // Fallback to YouTube embed
+                container.innerHTML = `
+                    <iframe 
+                        src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen
+                        loading="lazy">
+                    </iframe>
+                `;
+            }
+            
             document.getElementById('playerModal').classList.add('active');
             document.body.style.overflow = 'hidden';
         };
@@ -965,16 +951,24 @@
             deferredPrompt = null;
         };
         
+        // Instance selector
+        document.getElementById('instanceSelect').addEventListener('change', (e) => {
+            currentInstance = e.target.value;
+            localStorage.setItem('pipedInstance', currentInstance);
+            showToast(`Switched to ${new URL(currentInstance).hostname}`, 'success');
+        });
+        
+        // Set initial instance value
+        document.getElementById('instanceSelect').value = currentInstance;
+        
         // Service Worker Registration
         const registerSW = () => {
             if ('serviceWorker' in navigator) {
                 const swCode = `
-                    const CACHE_NAME = 'sonicvault-v1';
+                    const CACHE_NAME = 'sonicvault-v2';
                     const STATIC_ASSETS = [
                         '/',
-                        '/index.html',
-                        '/styles.css',
-                        '/app.js'
+                        '/index.html'
                     ];
                     
                     self.addEventListener('install', (event) => {
@@ -992,18 +986,17 @@
                     
                     self.addEventListener('fetch', (event) => {
                         const { request } = event;
-                        
-                        // Skip non-GET requests
                         if (request.method !== 'GET') return;
                         
-                        // Skip API requests
-                        if (request.url.includes('googleapis.com')) return;
+                        // Don't cache API requests
+                        if (request.url.includes('pipedapi') || request.url.includes('piped.')) {
+                            return;
+                        }
                         
                         event.respondWith(
                             caches.match(request).then((response) => {
                                 if (response) return response;
                                 return fetch(request).catch(() => {
-                                    // Return offline fallback for navigation requests
                                     if (request.mode === 'navigate') {
                                         return caches.match('/index.html');
                                     }
@@ -1026,7 +1019,7 @@
         window.addEventListener('online', updateConnectionStatus);
         window.addEventListener('offline', updateConnectionStatus);
         
-        document.getElementById('searchInput')?.addEventListener('keypress', (e) => {
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') performSearch();
         });
         
@@ -1035,24 +1028,18 @@
             await initDB();
             await loadSavedSongs();
             updateConnectionStatus();
-            updateApiStatus();
             registerSW();
             
             // Load initial state
-            if (currentTab === 'library') {
-                renderVideos(savedSongs);
-            } else {
-                document.getElementById('videoGrid').innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">🎵</div>
-                        <div class="empty-title">Welcome to SonicVault</div>
-                        <p>${youtubeApiKey ? 'Search for music above or check your library' : 'Configure your YouTube API key to get started'}</p>
-                    </div>
-                `;
-            }
+            document.getElementById('videoGrid').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">🎵</div>
+                    <div class="empty-title">Welcome to SonicVault</div>
+                    <p>Search for music above or check your library</p>
+                </div>
+            `;
         };
         
-        // Start
         init();
     </script>
 </body>
