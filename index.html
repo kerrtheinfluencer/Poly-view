@@ -1,640 +1,1059 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Polymarket Trade Tracker</title>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#050810;--bg2:#0a0e1a;--bg3:#0f1525;--bg4:#141d2e;
-  --b1:rgba(139,92,246,0.08);--b2:rgba(139,92,246,0.18);--b3:rgba(139,92,246,0.35);
-  --tx:#e8e0ff;--tx2:#7a6fa8;--tx3:#3a3060;
-  --pu:#8b5cf6;--pu2:rgba(139,92,246,0.1);
-  --gn:#10b981;--gn2:rgba(16,185,129,0.1);--gn3:rgba(16,185,129,0.18);
-  --rd:#ef4444;--rd2:rgba(239,68,68,0.1);--rd3:rgba(239,68,68,0.18);
-  --am:#f59e0b;--am2:rgba(245,158,11,0.1);
-  --bl:#3b82f6;--bl2:rgba(59,130,246,0.1);
-  --gd:#fbbf24;
-  --r:13px;--r2:8px;
-}
-body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;font-size:14px}
-
-header{background:var(--bg2);border-bottom:1px solid var(--b2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;gap:10px;flex-wrap:wrap}
-.hlogo{display:flex;align-items:center;gap:10px}
-.hicon{width:34px;height:34px;background:linear-gradient(135deg,#8b5cf6,#3b82f6);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;color:#fff;flex-shrink:0}
-.htitle{font-size:14px;font-weight:700;background:linear-gradient(135deg,#c4b5fd,#93c5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hsub{font-size:11px;color:var(--tx3)}
-.hbadge{font-size:11px;padding:3px 10px;border-radius:999px;display:flex;align-items:center;gap:5px}
-.hb-live{background:var(--gn2);color:var(--gn);border:1px solid rgba(16,185,129,.2)}
-.hb-off{background:var(--rd2);color:var(--rd);border:1px solid rgba(239,68,68,.2)}
-.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.dot-live{background:var(--gn);animation:pls 2s infinite}
-.dot-off{background:var(--rd)}
-@keyframes pls{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.5)}50%{box-shadow:0 0 0 5px rgba(16,185,129,0)}}
-
-main{max-width:980px;margin:0 auto;padding:12px 12px 60px}
-
-.card{background:var(--bg2);border:1px solid var(--b2);border-radius:var(--r);padding:12px 14px;margin-bottom:10px}
-.card-title{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--tx3);font-weight:600;margin-bottom:9px}
-
-/* search bar */
-.search-row{display:flex;gap:8px;flex-wrap:wrap}
-.addr-input{flex:1;min-width:200px;background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r2);padding:9px 12px;font-size:13px;color:var(--tx);font-family:monospace;transition:border .2s}
-.addr-input:focus{outline:none;border-color:var(--pu)}
-.addr-input::placeholder{color:var(--tx3)}
-.btn-load{background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;border:none;border-radius:var(--r2);padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .2s}
-.btn-load:hover{filter:brightness(1.1)}
-.btn-load:active{transform:scale(.97)}
-.btn-load:disabled{opacity:.35;cursor:not-allowed}
-.btn-s{background:transparent;border:1px solid var(--b2);border-radius:var(--r2);padding:9px 12px;font-size:12px;color:var(--tx2);cursor:pointer;transition:all .2s;white-space:nowrap}
-.btn-s:hover{border-color:var(--b3);color:var(--tx)}
-.btn-s.on{background:var(--pu2);color:var(--pu);border-color:var(--b3)}
-
-/* known traders */
-.known-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
-.kchip{font-size:11px;padding:4px 11px;border-radius:999px;border:1px solid var(--b2);color:var(--tx2);cursor:pointer;transition:all .15s;background:transparent}
-.kchip:hover{border-color:var(--pu);color:var(--pu)}
-
-/* profile */
-.profile-card{background:var(--bg2);border:1px solid var(--b2);border-radius:var(--r);margin-bottom:10px;overflow:hidden;display:none}
-.profile-card.show{display:block}
-.prof-hdr{background:var(--bg3);padding:12px 14px;border-bottom:1px solid var(--b1);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
-.prof-name{font-size:16px;font-weight:700}
-.prof-addr{font-family:monospace;font-size:11px;color:var(--tx2);cursor:pointer;margin-top:2px}
-.prof-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:12px 14px;border-bottom:1px solid var(--b1)}
-.pstat{background:var(--bg3);border-radius:var(--r2);padding:9px 10px;text-align:center}
-.pstat-l{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--tx3);margin-bottom:3px}
-.pstat-v{font-size:17px;font-weight:700;font-family:monospace}
-
-/* tabs */
-.tabs{display:flex;gap:0;border-bottom:1px solid var(--b2);margin-bottom:0}
-.tab{font-size:12px;font-weight:500;padding:10px 16px;color:var(--tx2);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
-.tab.on{color:var(--pu);border-bottom-color:var(--pu)}
-.tab:hover:not(.on){color:var(--tx)}
-.tab-content{display:none;padding:12px 14px}
-.tab-content.show{display:block}
-
-/* trades table */
-.trade-hdr{display:grid;grid-template-columns:1fr 70px 80px 90px 80px 80px;gap:8px;padding:8px 12px;background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r2) var(--r2) 0 0;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);font-weight:600}
-.trade-list{border:1px solid var(--b1);border-top:none;border-radius:0 0 var(--r) var(--r);overflow:hidden}
-.trade-row{display:grid;grid-template-columns:1fr 70px 80px 90px 80px 80px;gap:8px;padding:10px 12px;border-bottom:1px solid var(--b1);align-items:center;transition:background .12s}
-.trade-row:hover{background:var(--bg3)}
-.trade-row:last-child{border-bottom:none}
-.trade-row.live-row{border-left:3px solid var(--gn);animation:livepulse 3s ease-in-out infinite}
-@keyframes livepulse{0%,100%{background:transparent}50%{background:rgba(16,185,129,0.04)}}
-.market-q{font-size:12px;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.market-q small{display:block;font-size:10px;color:var(--tx3);margin-top:1px}
-.side-yes{font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700;background:var(--gn2);color:var(--gn);border:1px solid rgba(16,185,129,.2);text-align:center}
-.side-no{font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700;background:var(--rd2);color:var(--rd);border:1px solid rgba(239,68,68,.2);text-align:center}
-.side-buy{font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700;background:var(--gn2);color:var(--gn);border:1px solid rgba(16,185,129,.2);text-align:center}
-.side-sell{font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700;background:var(--rd2);color:var(--rd);border:1px solid rgba(239,68,68,.2);text-align:center}
-.price-cell{font-family:monospace;font-size:12px;font-weight:600;text-align:right}
-.size-cell{font-family:monospace;font-size:12px;font-weight:600;text-align:right;color:var(--tx)}
-.pnl-pos{font-family:monospace;font-size:12px;font-weight:700;color:var(--gn);text-align:right}
-.pnl-neg{font-family:monospace;font-size:12px;font-weight:700;color:var(--rd);text-align:right}
-.time-cell{font-size:11px;color:var(--tx3);text-align:right}
-.live-badge{font-size:10px;padding:1px 6px;border-radius:999px;background:var(--gn2);color:var(--gn);border:1px solid rgba(16,185,129,.2);font-weight:700;margin-left:4px}
-
-/* positions */
-.pos-hdr{display:grid;grid-template-columns:1fr 70px 90px 90px 80px;gap:8px;padding:8px 12px;background:var(--bg3);border:1px solid var(--b2);border-radius:var(--r2) var(--r2) 0 0;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);font-weight:600}
-.pos-list{border:1px solid var(--b1);border-top:none;border-radius:0 0 var(--r) var(--r);overflow:hidden}
-.pos-row{display:grid;grid-template-columns:1fr 70px 90px 90px 80px;gap:8px;padding:10px 12px;border-bottom:1px solid var(--b1);align-items:center;transition:background .12s}
-.pos-row:hover{background:var(--bg3)}
-.pos-row:last-child{border-bottom:none}
-.pos-pct{height:4px;background:var(--b1);border-radius:999px;overflow:hidden;margin-top:3px}
-.pos-pct-fill{height:100%;border-radius:999px}
-
-/* status */
-.strow{display:flex;align-items:center;gap:7px;margin-top:8px;font-size:12px;color:var(--tx2);min-height:16px}
-.spin{width:12px;height:12px;border:2px solid var(--b2);border-top-color:var(--pu);border-radius:50%;animation:sp .6s linear infinite;flex-shrink:0}
-@keyframes sp{to{transform:rotate(360deg)}}
-
-/* refresh bar */
-.refresh-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:var(--bg3);border-top:1px solid var(--b1)}
-.rb-left{font-size:11px;color:var(--tx3);display:flex;align-items:center;gap:6px}
-.rb-count{width:50px;height:3px;background:var(--b1);border-radius:999px;overflow:hidden}
-.rb-fill{height:100%;background:var(--pu);border-radius:999px;transition:width 1s linear}
-
-/* empty / error */
-.empty{padding:28px;text-align:center;color:var(--tx3);font-size:13px;line-height:1.7}
-.errbar{background:var(--rd2);border:1px solid rgba(239,68,68,.22);border-radius:var(--r2);padding:8px 12px;font-size:12px;color:var(--rd);margin-bottom:9px;display:none;line-height:1.5}
-.disc{background:var(--am2);border:1px solid rgba(245,158,11,.18);border-radius:var(--r2);padding:8px 12px;font-size:11px;color:var(--am);line-height:1.6;margin-bottom:10px}
-
-/* copy toast */
-.toast{position:fixed;bottom:16px;right:16px;background:var(--bg3);border:1px solid var(--b3);border-radius:var(--r2);padding:8px 13px;font-size:13px;color:var(--pu);z-index:999;display:none}
-
-/* live indicator */
-.live-counter{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gn)}
-
-@media(max-width:700px){
-  .trade-hdr,.trade-row{grid-template-columns:1fr 60px 75px 70px}
-  .trade-hdr>*:nth-child(5),.trade-row>*:nth-child(5),
-  .trade-hdr>*:nth-child(6),.trade-row>*:nth-child(6){display:none}
-  .pos-hdr,.pos-row{grid-template-columns:1fr 60px 80px 70px}
-  .pos-hdr>*:nth-child(4),.pos-row>*:nth-child(4){display:none}
-  .prof-stats{grid-template-columns:repeat(3,1fr)}
-}
-@media(max-width:480px){
-  .trade-hdr,.trade-row{grid-template-columns:1fr 55px 70px}
-  .trade-hdr>*:nth-child(4),.trade-row>*:nth-child(4){display:none}
-  .prof-stats{grid-template-columns:repeat(2,1fr)}
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SonicVault - A Progressive Web App for saving YouTube music for offline listening">
+    <meta name="theme-color" content="#7c3dff">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
+    <title>SonicVault - Offline Music PWA</title>
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #151520;
+            --bg-tertiary: #1a1a2e;
+            --accent-primary: #7c3dff;
+            --accent-secondary: #00d4ff;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --error: #ff4444;
+            --glass: rgba(21, 21, 32, 0.8);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .bg-animation {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(124, 61, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 212, 255, 0.15) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(20px, -20px); }
+        }
+        
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(124, 61, 255, 0.2);
+            padding: 1rem 1.5rem;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .status-bar {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .api-status, .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 20px;
+            font-size: 0.875rem;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .api-status.configured { border-color: var(--success); color: var(--success); }
+        .api-status.unconfigured { border-color: var(--warning); color: var(--warning); cursor: pointer; }
+        .connection-status.online { border-color: var(--success); color: var(--success); }
+        .connection-status.offline { border-color: var(--warning); color: var(--warning); }
+        
+        .status-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        
+        .api-setup {
+            background: var(--bg-secondary);
+            border: 1px solid rgba(124, 61, 255, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .api-setup h2 {
+            margin-bottom: 1rem;
+            color: var(--accent-primary);
+        }
+        
+        .api-setup input {
+            width: 100%;
+            max-width: 400px;
+            padding: 0.75rem 1rem;
+            background: var(--bg-primary);
+            border: 1px solid rgba(124, 61, 255, 0.3);
+            border-radius: 8px;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-family: inherit;
+        }
+        
+        .api-setup button {
+            padding: 0.75rem 2rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .api-setup button:hover { transform: translateY(-2px); }
+        
+        .quota-info {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .search-section { margin-bottom: 2rem; }
+        
+        .search-container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1.5rem;
+            background: var(--bg-secondary);
+            border: 2px solid rgba(124, 61, 255, 0.3);
+            border-radius: 16px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 30px rgba(124, 61, 255, 0.2);
+        }
+        
+        .search-btn {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: transform 0.2s;
+        }
+        
+        .search-btn:hover { transform: translateY(-50%) scale(1.05); }
+        .search-btn:active { transform: translateY(-50%) scale(0.95); }
+        .search-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--bg-tertiary);
+            overflow-x: auto;
+        }
+        
+        .tab {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 1rem;
+            cursor: pointer;
+            white-space: nowrap;
+            position: relative;
+            transition: color 0.3s;
+        }
+        
+        .tab.active {
+            color: var(--accent-primary);
+        }
+        
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .video-card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(124, 61, 255, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .video-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(124, 61, 255, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        .video-thumbnail {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+            background: var(--bg-tertiary);
+        }
+        
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+        
+        .video-card:hover .video-thumbnail img { transform: scale(1.05); }
+        
+        .play-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+            cursor: pointer;
+        }
+        
+        .video-card:hover .play-overlay { opacity: 1; }
+        
+        .play-btn {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            transform: scale(0.8);
+            transition: transform 0.3s;
+        }
+        
+        .play-overlay:hover .play-btn { transform: scale(1); }
+        
+        .video-info { padding: 1.25rem; }
+        
+        .video-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .video-channel {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+        
+        .video-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid rgba(124, 61, 255, 0.3);
+        }
+        
+        .action-btn:hover { transform: scale(1.02); }
+        .action-btn:active { transform: scale(0.98); }
+        .action-btn.saved { background: var(--success); color: var(--bg-primary); }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .modal.active { display: flex; }
+        
+        .modal-content {
+            width: 100%;
+            max-width: 900px;
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            overflow: hidden;
+            position: relative;
+            animation: modalIn 0.3s ease;
+        }
+        
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        
+        .modal-close:hover { background: var(--error); }
+        
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+        }
+        
+        .video-container iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+            grid-column: 1 / -1;
+        }
+        
+        .empty-icon { font-size: 4rem; margin-bottom: 1rem; opacity: 0.5; }
+        .empty-title { font-size: 1.5rem; color: var(--text-primary); margin-bottom: 0.5rem; }
+        
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-width: 400px;
+        }
+        
+        .toast {
+            padding: 1rem 1.5rem;
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--accent-primary);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--error); }
+        .toast.warning { border-left-color: var(--warning); }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--bg-tertiary);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .install-btn {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(124, 61, 255, 0.4);
+            transition: all 0.3s;
+            display: none;
+            z-index: 100;
+        }
+        
+        .install-btn.visible { display: block; animation: bounceIn 0.5s ease; }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .install-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(124, 61, 255, 0.5);
+        }
+        
+        .hidden { display: none !important; }
+        
+        @media (max-width: 768px) {
+            .content-grid { grid-template-columns: 1fr; }
+            .quota-info { flex-direction: column; gap: 0.5rem; }
+            .header-content { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
 </head>
 <body>
-<div class="toast" id="toast">Copied!</div>
-
-<header>
-  <div class="hlogo">
-    <div class="hicon">P</div>
-    <div><div class="htitle">Polymarket Trade Tracker</div><div class="hsub">Live positions & trade history for any wallet</div></div>
-  </div>
-  <div class="hbadge hb-off" id="liveBadge">
-    <span class="dot dot-off" id="liveDot"></span>
-    <span id="liveLabel">Offline</span>
-  </div>
-</header>
-
-<main>
-  <div class="disc">Reads public on-chain Polymarket data. Paste any wallet address to see ALL their trades and live positions in real time.</div>
-  <div class="errbar" id="errBar"></div>
-
-  <!-- Search -->
-  <div class="card">
-    <div class="card-title">Wallet Address</div>
-    <div class="search-row">
-      <input class="addr-input" type="text" id="addrInput" placeholder="0x... paste wallet address here" />
-      <button class="btn-load" id="loadBtn" onclick="loadWallet()">Load Wallet</button>
-      <button class="btn-s" id="autoBtn" onclick="toggleAuto()">Auto-refresh: OFF</button>
-    </div>
-    <div class="strow" id="stRow"><span id="stTxt">Paste a wallet address and tap Load</span></div>
-    <div class="card-title" style="margin-top:10px;margin-bottom:6px">Known Top Traders</div>
-    <div class="known-row" id="knownRow"></div>
-  </div>
-
-  <!-- Profile -->
-  <div class="profile-card" id="profileCard">
-    <div class="prof-hdr">
-      <div>
-        <div class="prof-name" id="profName">—</div>
-        <div class="prof-addr" id="profAddr" onclick="copyAddr()">— (tap to copy)</div>
-      </div>
-      <div style="display:flex;gap:7px;align-items:center">
-        <button class="btn-s" onclick="openOnPoly()">View on Polymarket ↗</button>
-        <div class="live-counter" id="liveCounter" style="display:none">
-          <span class="dot dot-live"></span>
-          <span id="liveCount">0 live</span>
+    <div class="bg-animation"></div>
+    
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <span style="font-size: 2rem;">🎵</span>
+                SonicVault
+            </div>
+            <div class="status-bar">
+                <div class="api-status unconfigured" id="apiStatus" onclick="showApiSetup()">
+                    <span class="status-dot"></span>
+                    <span id="apiStatusText">API Key Needed</span>
+                </div>
+                <div class="connection-status online" id="connectionStatus">
+                    <span class="status-dot"></span>
+                    <span id="statusText">Online</span>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="prof-stats">
-      <div class="pstat"><div class="pstat-l">Total PnL</div><div class="pstat-v" id="psPnl">—</div></div>
-      <div class="pstat"><div class="pstat-l">Win Rate</div><div class="pstat-v" id="psWR" style="color:var(--pu)">—</div></div>
-      <div class="pstat"><div class="pstat-l">Open Pos.</div><div class="pstat-v" id="psOpen" style="color:var(--bl)">—</div></div>
-      <div class="pstat"><div class="pstat-l">Total Trades</div><div class="pstat-v" id="psTrades">—</div></div>
-      <div class="pstat"><div class="pstat-l">Volume</div><div class="pstat-v" id="psVol" style="color:var(--am)">—</div></div>
-    </div>
-    <div class="tabs">
-      <div class="tab on" onclick="showTab('trades',this)">Trade History</div>
-      <div class="tab" onclick="showTab('positions',this)">Live Positions</div>
-      <div class="tab" onclick="showTab('pnl',this)">PnL Breakdown</div>
-    </div>
-
-    <!-- Trades tab -->
-    <div class="tab-content show" id="tab-trades">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;flex-wrap:wrap;gap:6px">
-        <span style="font-size:11px;color:var(--tx3)" id="tradeCount">—</span>
-        <div style="display:flex;gap:6px">
-          <button class="btn-s" id="filterAll" onclick="filterTrades('all',this)">All</button>
-          <button class="btn-s" onclick="filterTrades('buy',this)">BUY only</button>
-          <button class="btn-s" onclick="filterTrades('sell',this)">SELL only</button>
-          <button class="btn-s" onclick="filterTrades('big',this)">$500+</button>
+    </header>
+    
+    <div class="container">
+        <div class="api-setup hidden" id="apiSetup">
+            <h2>🔑 YouTube API Configuration</h2>
+            <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">
+                To search YouTube videos, you need a YouTube Data API v3 key. 
+                <a href="https://console.cloud.google.com/apis/credentials" target="_blank" style="color: var(--accent-secondary);">Get one here</a>
+            </p>
+            <input type="password" id="apiKeyInput" placeholder="Enter your YouTube API Key...">
+            <br>
+            <button onclick="saveApiKey()">Save API Key</button>
+            <div class="quota-info">
+                <span>📊 Daily Quota: 10,000 units</span>
+                <span>🔍 Search cost: 100 units/request</span>
+                <span>📹 Video details: 1 unit/request</span>
+            </div>
+            <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-secondary);">
+                Your API key is stored locally in your browser and never sent to our servers.
+            </p>
         </div>
-      </div>
-      <div class="trade-hdr"><span>Market</span><span>Outcome</span><span>Side</span><span>Price</span><span>Size $</span><span>Time</span></div>
-      <div class="trade-list" id="tradeList"><div class="empty">No trades loaded</div></div>
-      <div id="loadMoreWrap" style="text-align:center;margin-top:9px;display:none">
-        <button class="btn-s" onclick="loadMoreTrades()">Load more trades</button>
-      </div>
+        
+        <section class="search-section">
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search for music on YouTube..." disabled>
+                <button class="search-btn" id="searchBtn" onclick="performSearch()" disabled>🔍</button>
+            </div>
+        </section>
+        
+        <nav class="tabs">
+            <button class="tab active" data-tab="search" onclick="switchTab('search')">Search Results</button>
+            <button class="tab" data-tab="library" onclick="switchTab('library')">My Library</button>
+        </nav>
+        
+        <main id="contentArea">
+            <div class="content-grid" id="videoGrid"></div>
+        </main>
     </div>
-
-    <!-- Positions tab -->
-    <div class="tab-content" id="tab-positions">
-      <div style="margin-bottom:9px;font-size:11px;color:var(--tx3)" id="posCount">—</div>
-      <div class="pos-hdr"><span>Market</span><span>Side</span><span>Value $</span><span>Shares</span><span>Cur Price</span></div>
-      <div class="pos-list" id="posList"><div class="empty">No positions loaded</div></div>
+    
+    <div class="modal" id="playerModal" onclick="closePlayer(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closePlayer()">×</button>
+            <div class="video-container" id="videoContainer"></div>
+        </div>
     </div>
+    
+    <div class="toast-container" id="toastContainer"></div>
+    <button class="install-btn" id="installBtn" onclick="installApp()">📲 Install App</button>
 
-    <!-- PnL tab -->
-    <div class="tab-content" id="tab-pnl">
-      <div id="pnlBreakdown" class="empty">Load wallet to see PnL breakdown</div>
-    </div>
-
-    <!-- Refresh bar -->
-    <div class="refresh-bar" id="refreshBar" style="display:none">
-      <div class="rb-left">
-        <span class="dot dot-live"></span>
-        Auto-refreshing every 30s
-        <div class="rb-count"><div class="rb-fill" id="rbFill" style="width:100%"></div></div>
-      </div>
-      <span id="lastRefresh" style="font-size:11px;color:var(--tx3)">—</span>
-    </div>
-  </div>
-</main>
-
-<script>
-// ── KNOWN TRADERS ─────────────────────────────────────
-var KNOWN = [
-  {name:'Tetranode', addr:'0x56687bf447db6ffa42ffe2204a05edaa20f55839'},
-  {name:'Fiskantes', addr:'0xb438a7a74d6baa19ea6d0b03491c8cc5fcf13a32'},
-  {name:'Achilles',  addr:'0x7ecf6cd8c2a10f1b9cfc7ade4a13c0c2b6bb0a4b'},
-  {name:'Gurkha',    addr:'0x3fb523b5b5cd5eb12c3f2fcb3bd98f17a5b30ebe'},
-  {name:'Natasha',   addr:'0x43988e5d6cda6be2a6b580fa44c5fc12c05db6d6'},
-  {name:'Inkar',     addr:'0xda43d85b8d419a9c51bbf0089a5b9c67a30ec840'},
-];
-
-// ── STATE ─────────────────────────────────────────────
-var currentAddr = '';
-var allTrades = [];
-var allPositions = [];
-var tradeOffset = 0;
-var tradeFilter = 'all';
-var autoOn = false;
-var autoTimer = null;
-var rbTimer = null;
-var rbSecs = 30;
-var currentTab = 'trades';
-
-// ── API ───────────────────────────────────────────────
-var DATA = 'https://data-api.polymarket.com';
-var GAMMA = 'https://gamma-api.polymarket.com';
-// CORS proxies to try in order
-var PROXIES = [
-  function(u){ return 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u); },
-  function(u){ return 'https://corsproxy.io/?url=' + encodeURIComponent(u); },
-  function(u){ return 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u); },
-  function(u){ return u; } // direct last resort
-];
-
-async function apiFetch(path) {
-  var url = DATA + path;
-  var lastErr;
-  for (var i = 0; i < PROXIES.length; i++) {
-    try {
-      var proxied = PROXIES[i](url);
-      var res = await fetch(proxied, {
-        headers: {'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0'},
-        signal: AbortSignal.timeout(8000)
-      });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      var data = await res.json();
-      // Mark which proxy worked
-      if (i > 0) console.log('Used proxy #' + i + ' for', path);
-      return data;
-    } catch(e) {
-      lastErr = e;
-    }
-  }
-  throw lastErr;
-}
-
-// ── INIT ──────────────────────────────────────────────
-function init() {
-  var knownRow = el('knownRow');
-  KNOWN.forEach(function(t) {
-    var chip = document.createElement('span');
-    chip.className = 'kchip';
-    chip.textContent = t.name;
-    chip.onclick = function() {
-      el('addrInput').value = t.addr;
-      loadWallet();
-    };
-    knownRow.appendChild(chip);
-  });
-  el('filterAll').classList.add('on');
-}
-
-// ── LOAD WALLET ───────────────────────────────────────
-async function loadWallet() {
-  var addr = el('addrInput').value.trim();
-  if (!addr) { showErr('Enter a wallet address.'); return; }
-  if (!addr.startsWith('0x') && !addr.includes('.eth')) { showErr('Address should start with 0x or be an ENS name.'); return; }
-  currentAddr = addr;
-  tradeOffset = 0;
-  allTrades = [];
-  allPositions = [];
-  hideErr();
-  el('loadBtn').disabled = true;
-  setSt('Connecting to Polymarket...', true);
-  setBadge(false);
-
-  try {
-    await Promise.all([loadTrades(true), loadPositions()]);
-    loadProfile();
-    el('profileCard').classList.add('show');
-    setBadge(true);
-    setSt('Loaded — ' + new Date().toLocaleTimeString(), false);
-    el('refreshBar').style.display = autoOn ? 'flex' : 'none';
-  } catch(e) {
-    showErr('Could not load wallet data: ' + e.message + '. The Polymarket API may be temporarily unavailable from your location.');
-    setSt('Failed to load', false);
-    setBadge(false);
-  }
-  el('loadBtn').disabled = false;
-}
-
-async function loadTrades(reset) {
-  var limit = 50;
-  var url = '/trades?maker=' + currentAddr + '&limit=' + limit + '&offset=' + tradeOffset;
-  var data = await apiFetch(url);
-  var trades = Array.isArray(data) ? data : (data.data || data.trades || []);
-
-  if (reset) allTrades = trades;
-  else allTrades = allTrades.concat(trades);
-
-  tradeOffset = allTrades.length;
-  renderTrades();
-  el('tradeCount').textContent = allTrades.length + ' trades total';
-  el('loadMoreWrap').style.display = trades.length >= limit ? 'block' : 'none';
-
-  // Update profile stats
-  el('psTrades').textContent = allTrades.length + '+';
-  var vol = allTrades.reduce(function(s, t){ return s + (parseFloat(t.size) * parseFloat(t.price) || 0); }, 0);
-  el('psVol').textContent = fmtUSD(vol);
-}
-
-async function loadMoreTrades() {
-  setSt('Loading more trades...', true);
-  try {
-    await loadTrades(false);
-    setSt('Loaded — ' + new Date().toLocaleTimeString(), false);
-  } catch(e) {
-    setSt('Error: ' + e.message, false);
-  }
-}
-
-async function loadPositions() {
-  var url = '/positions?user=' + currentAddr + '&sizeThreshold=0.01&limit=50';
-  var data = await apiFetch(url);
-  allPositions = Array.isArray(data) ? data : (data.data || data.positions || []);
-  renderPositions();
-
-  var openCount = allPositions.filter(function(p){ return parseFloat(p.size) > 0; }).length;
-  el('psOpen').textContent = openCount;
-  el('posCount').textContent = openCount + ' open positions';
-
-  if (openCount > 0) {
-    el('liveCounter').style.display = 'flex';
-    el('liveCount').textContent = openCount + ' live';
-  }
-}
-
-function loadProfile() {
-  // Try to get profile info
-  var known = KNOWN.find(function(t){ return t.addr.toLowerCase() === currentAddr.toLowerCase(); });
-  el('profName').textContent = known ? known.name : 'Unknown Trader';
-  el('profAddr').textContent = currentAddr;
-  el('profAddr').dataset.full = currentAddr;
-
-  // Calculate basic stats from trades
-  var wins = 0, losses = 0, totalPnl = 0;
-  allTrades.forEach(function(t) {
-    var pnl = parseFloat(t.profit || 0);
-    if (pnl > 0) wins++;
-    else if (pnl < 0) losses++;
-    totalPnl += pnl;
-  });
-  var total = wins + losses;
-  el('psWR').textContent = total > 0 ? Math.round(wins/total*100) + '%' : '—';
-  el('psPnl').textContent = totalPnl ? (totalPnl>=0?'+':'')+fmtUSD(totalPnl) : '—';
-  el('psPnl').style.color = totalPnl >= 0 ? 'var(--gn)' : 'var(--rd)';
-  renderPnlBreakdown();
-}
-
-// ── RENDER TRADES ─────────────────────────────────────
-function renderTrades() {
-  var list = el('tradeList');
-  var filtered = allTrades.filter(function(t) {
-    if (tradeFilter === 'buy') return (t.side||'').toUpperCase() === 'BUY';
-    if (tradeFilter === 'sell') return (t.side||'').toUpperCase() === 'SELL';
-    if (tradeFilter === 'big') return parseFloat(t.size) * parseFloat(t.price) >= 500;
-    return true;
-  });
-
-  if (!filtered.length) { list.innerHTML = '<div class="empty">No trades match this filter.</div>'; return; }
-
-  // Check which are "live" (position still open)
-  var openMarkets = {};
-  allPositions.forEach(function(p){ if (parseFloat(p.size) > 0) openMarkets[p.conditionId || p.asset] = true; });
-
-  list.innerHTML = filtered.map(function(t) {
-    var side = (t.side||'BUY').toUpperCase();
-    var outcome = (t.outcome || '').toUpperCase();
-    var price = parseFloat(t.price) || 0;
-    var size = parseFloat(t.size) || 0;
-    var usdSize = size * price;
-    var title = t.title || t.market || 'Unknown market';
-    var ts = t.timestamp ? new Date(t.timestamp * 1000) : null;
-    var timeStr = ts ? fmtTime(ts) : '—';
-    var isLive = openMarkets[t.conditionId || t.asset];
-    var pnl = parseFloat(t.profit || 0);
-
-    return '<div class="trade-row' + (isLive ? ' live-row' : '') + '">'
-      + '<div><div class="market-q">' + esc(title.slice(0,60)) + (isLive ? '<span class="live-badge">LIVE</span>' : '') + '</div>'
-      + '<small class="market-q" style="color:var(--tx3)">' + esc(outcome || 'Unknown outcome') + '</small></div>'
-      + '<div class="' + (outcome==='YES'?'side-yes':'side-no') + '">' + (outcome||'—') + '</div>'
-      + '<div class="' + (side==='BUY'?'side-buy':'side-sell') + '">' + side + '</div>'
-      + '<div class="price-cell" style="color:var(--tx2)">' + (price*100).toFixed(1) + '¢</div>'
-      + '<div class="size-cell">' + fmtUSD(usdSize) + '</div>'
-      + '<div class="time-cell">' + timeStr + '</div>'
-      + '</div>';
-  }).join('');
-}
-
-function filterTrades(f, btn) {
-  tradeFilter = f;
-  document.querySelectorAll('.btn-s').forEach(function(b){ b.classList.remove('on'); });
-  btn.classList.add('on');
-  renderTrades();
-}
-
-// ── RENDER POSITIONS ──────────────────────────────────
-function renderPositions() {
-  var list = el('posList');
-  var active = allPositions.filter(function(p){ return parseFloat(p.size) > 0; });
-  if (!active.length) { list.innerHTML = '<div class="empty">No open positions found.</div>'; return; }
-
-  // Sort by value desc
-  active.sort(function(a,b){ return (parseFloat(b.size)*parseFloat(b.curPrice||0.5)) - (parseFloat(a.size)*parseFloat(a.curPrice||0.5)); });
-
-  var totalValue = active.reduce(function(s,p){ return s + parseFloat(p.size)*(parseFloat(p.curPrice)||0.5); }, 0);
-
-  list.innerHTML = active.map(function(p) {
-    var title = p.title || p.market || p.question || 'Unknown market';
-    var side = (p.outcome || p.side || 'YES').toUpperCase();
-    var shares = parseFloat(p.size) || 0;
-    var curPrice = parseFloat(p.curPrice) || 0.5;
-    var value = shares * curPrice;
-    var pct = totalValue > 0 ? value / totalValue * 100 : 0;
-    var isYes = side === 'YES';
-    var priceColor = isYes ? 'var(--gn)' : 'var(--rd)';
-
-    return '<div class="pos-row">'
-      + '<div><div class="market-q">' + esc(title.slice(0,55)) + '</div>'
-      + '<div class="pos-pct"><div class="pos-pct-fill" style="width:' + pct.toFixed(1) + '%;background:' + (isYes?'var(--gn)':'var(--rd)') + '"></div></div></div>'
-      + '<div class="' + (isYes?'side-yes':'side-no') + '">' + side + '</div>'
-      + '<div class="size-cell">' + fmtUSD(value) + '</div>'
-      + '<div class="size-cell" style="color:var(--tx2)">' + shares.toFixed(0) + '</div>'
-      + '<div class="price-cell" style="color:' + priceColor + '">' + (curPrice*100).toFixed(1) + '¢</div>'
-      + '</div>';
-  }).join('');
-}
-
-// ── PNL BREAKDOWN ─────────────────────────────────────
-function renderPnlBreakdown() {
-  var div = el('pnlBreakdown');
-  if (!allTrades.length) { div.className='empty'; div.textContent='No trade data available.'; return; }
-  div.className = '';
-
-  // Group by market
-  var markets = {};
-  allTrades.forEach(function(t){
-    var key = t.conditionId || t.title || 'unknown';
-    if (!markets[key]) markets[key] = {title: t.title||'Unknown', pnl:0, trades:0, vol:0};
-    markets[key].pnl += parseFloat(t.profit||0);
-    markets[key].trades++;
-    markets[key].vol += parseFloat(t.size||0)*parseFloat(t.price||0);
-  });
-
-  var sorted = Object.values(markets).sort(function(a,b){ return Math.abs(b.pnl)-Math.abs(a.pnl); }).slice(0,15);
-
-  div.innerHTML = '<div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);margin-bottom:9px">Top Markets by PnL</div>'
-    + sorted.map(function(m){
-      var isPos = m.pnl >= 0;
-      var barW = Math.min(Math.abs(m.pnl)/Math.max(...sorted.map(function(x){return Math.abs(x.pnl);}),1)*100, 100);
-      return '<div style="margin-bottom:10px">'
-        + '<div style="display:flex;justify-content:space-between;margin-bottom:3px">'
-        + '<span style="font-size:12px;color:var(--tx);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:8px">' + esc(m.title.slice(0,50)) + '</span>'
-        + '<span style="font-family:monospace;font-size:12px;font-weight:700;color:' + (isPos?'var(--gn)':'var(--rd)') + ';white-space:nowrap">' + (isPos?'+':'') + fmtUSD(m.pnl) + '</span>'
-        + '</div>'
-        + '<div style="height:4px;background:var(--b1);border-radius:999px;overflow:hidden">'
-        + '<div style="width:' + barW + '%;height:100%;background:' + (isPos?'var(--gn)':'var(--rd)') + ';border-radius:999px"></div>'
-        + '</div>'
-        + '<div style="font-size:10px;color:var(--tx3);margin-top:2px">' + m.trades + ' trades · Vol ' + fmtUSD(m.vol) + '</div>'
-        + '</div>';
-    }).join('');
-}
-
-// ── AUTO REFRESH ──────────────────────────────────────
-function toggleAuto() {
-  autoOn = !autoOn;
-  var btn = el('autoBtn');
-  btn.textContent = 'Auto-refresh: ' + (autoOn ? 'ON' : 'OFF');
-  btn.className = 'btn-s' + (autoOn ? ' on' : '');
-  el('refreshBar').style.display = autoOn && currentAddr ? 'flex' : 'none';
-
-  if (autoOn) {
-    startAutoRefresh();
-  } else {
-    clearInterval(autoTimer);
-    clearInterval(rbTimer);
-  }
-}
-
-function startAutoRefresh() {
-  if (autoTimer) clearInterval(autoTimer);
-  if (rbTimer) clearInterval(rbTimer);
-  rbSecs = 30;
-  el('rbFill').style.width = '100%';
-
-  rbTimer = setInterval(function(){
-    rbSecs--;
-    var pct = (rbSecs / 30 * 100);
-    el('rbFill').style.width = pct + '%';
-    if (rbSecs <= 0) rbSecs = 30;
-  }, 1000);
-
-  autoTimer = setInterval(async function(){
-    if (!currentAddr) return;
-    rbSecs = 30;
-    el('lastRefresh').textContent = 'Refreshing...';
-    try {
-      await Promise.all([loadTrades(true), loadPositions()]);
-      el('lastRefresh').textContent = 'Updated ' + new Date().toLocaleTimeString();
-    } catch(e) {
-      el('lastRefresh').textContent = 'Refresh failed';
-    }
-  }, 30000);
-}
-
-// ── TABS ──────────────────────────────────────────────
-function showTab(name, btn) {
-  currentTab = name;
-  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('on'); });
-  document.querySelectorAll('.tab-content').forEach(function(t){ t.classList.remove('show'); });
-  btn.classList.add('on');
-  el('tab-' + name).classList.add('show');
-}
-
-// ── UTILS ─────────────────────────────────────────────
-function el(id){ return document.getElementById(id); }
-
-function fmtUSD(n){
-  var v = Math.abs(parseFloat(n)||0);
-  return v>=1e6 ? '$'+(v/1e6).toFixed(2)+'M' : v>=1000 ? '$'+(v/1000).toFixed(1)+'K' : '$'+v.toFixed(0);
-}
-
-function fmtTime(d){
-  var now = new Date();
-  var diff = now - d;
-  if (diff < 60000) return Math.floor(diff/1000) + 's ago';
-  if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
-  if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
-  return d.toLocaleDateString();
-}
-
-function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-function setBadge(live) {
-  var badge = el('liveBadge');
-  var dot = el('liveDot');
-  var label = el('liveLabel');
-  if (live) {
-    badge.className = 'hbadge hb-live';
-    dot.className = 'dot dot-live';
-    label.textContent = 'Connected';
-  } else {
-    badge.className = 'hbadge hb-off';
-    dot.className = 'dot dot-off';
-    label.textContent = 'Offline';
-  }
-}
-
-function setSt(m, s) {
-  el('stRow').innerHTML = s
-    ? '<div class="spin"></div><span id="stTxt">' + m + '</span>'
-    : '<span id="stTxt">' + m + '</span>';
-}
-
-function showErr(m){ el('errBar').textContent = m; el('errBar').style.display = 'block'; }
-function hideErr(){ el('errBar').style.display = 'none'; }
-
-function copyAddr() {
-  var a = el('profAddr').dataset.full || currentAddr;
-  if (!a) return;
-  navigator.clipboard && navigator.clipboard.writeText(a).then(function(){
-    el('toast').style.display = 'block';
-    setTimeout(function(){ el('toast').style.display='none'; }, 2000);
-  });
-}
-
-function openOnPoly() {
-  if (currentAddr) window.open('https://polymarket.com/profile/' + currentAddr, '_blank');
-}
-
-// ── START ─────────────────────────────────────────────
-init();
-</script>
+    <script>
+        // Configuration
+        const DB_NAME = 'SonicVaultDB_v1';
+        const DB_VERSION = 1;
+        const YOUTUBE_API_BASE = 'https://www.googleapis.com/youtube/v3';
+        const QUOTA_SEARCH_COST = 100;
+        const QUOTA_VIDEO_COST = 1;
+        const DAILY_QUOTA = 10000;
+        
+        let db;
+        let youtubeApiKey = localStorage.getItem('youtubeApiKey') || '';
+        let currentTab = 'search';
+        let searchResults = [];
+        let savedSongs = [];
+        let quotaUsed = parseInt(localStorage.getItem('quotaUsed') || '0');
+        let quotaResetDate = localStorage.getItem('quotaResetDate') || new Date().toDateString();
+        
+        // Check quota reset
+        if (quotaResetDate !== new Date().toDateString()) {
+            quotaUsed = 0;
+            quotaResetDate = new Date().toDateString();
+            localStorage.setItem('quotaResetDate', quotaResetDate);
+            localStorage.setItem('quotaUsed', '0');
+        }
+        
+        // Initialize IndexedDB
+        const initDB = () => {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+                request.onupgradeneeded = (event) => {
+                    const database = event.target.result;
+                    if (!database.objectStoreNames.contains('songs')) {
+                        const store = database.createObjectStore('songs', { keyPath: 'id' });
+                        store.createIndex('savedAt', 'savedAt', { unique: false });
+                    }
+                };
+            });
+        };
+        
+        // API Key Management
+        const showApiSetup = () => {
+            document.getElementById('apiSetup').classList.remove('hidden');
+        };
+        
+        const saveApiKey = () => {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            if (!key) {
+                showToast('Please enter a valid API key', 'error');
+                return;
+            }
+            
+            youtubeApiKey = key;
+            localStorage.setItem('youtubeApiKey', key);
+            document.getElementById('apiSetup').classList.add('hidden');
+            updateApiStatus();
+            showToast('API Key saved successfully!', 'success');
+            
+            // Enable search
+            document.getElementById('searchInput').disabled = false;
+            document.getElementById('searchBtn').disabled = false;
+        };
+        
+        const updateApiStatus = () => {
+            const statusEl = document.getElementById('apiStatus');
+            const statusText = document.getElementById('apiStatusText');
+            
+            if (youtubeApiKey) {
+                statusEl.classList.remove('unconfigured');
+                statusEl.classList.add('configured');
+                statusEl.onclick = null;
+                statusText.textContent = 'API Ready';
+                document.getElementById('searchInput').disabled = false;
+                document.getElementById('searchBtn').disabled = false;
+            } else {
+                showApiSetup();
+            }
+        };
+        
+        // YouTube API Functions
+        const searchYouTube = async (query) => {
+            if (!youtubeApiKey) throw new Error('API key not configured');
+            
+            const remainingQuota = DAILY_QUOTA - quotaUsed;
+            if (remainingQuota < QUOTA_SEARCH_COST) {
+                throw new Error(`Daily quota exceeded. Resets at midnight PT. Used: ${quotaUsed}/${DAILY_QUOTA}`);
+            }
+            
+            try {
+                const response = await fetch(
+                    `${YOUTUBE_API_BASE}/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=12&key=${youtubeApiKey}`
+                );
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error?.message || 'Search failed');
+                }
+                
+                quotaUsed += QUOTA_SEARCH_COST;
+                localStorage.setItem('quotaUsed', quotaUsed.toString());
+                
+                const data = await response.json();
+                return data.items.map(item => ({
+                    id: item.id.videoId,
+                    title: item.snippet.title,
+                    channel: item.snippet.channelTitle,
+                    thumbnail: item.snippet.thumbnails.medium?.url || item.snippet.thumbnails.default?.url,
+                    publishedAt: item.snippet.publishedAt
+                }));
+            } catch (error) {
+                if (error.message.includes('quota')) throw error;
+                throw new Error('Search failed: ' + error.message);
+            }
+        };
+        
+        // Database Operations
+        const loadSavedSongs = async () => {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['songs'], 'readonly');
+                const store = transaction.objectStore('songs');
+                const request = store.getAll();
+                
+                request.onsuccess = () => {
+                    savedSongs = request.result.sort((a, b) => b.savedAt - a.savedAt);
+                    resolve(savedSongs);
+                };
+                request.onerror = () => reject(request.error);
+            });
+        };
+        
+        const saveSong = async (video) => {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['songs'], 'readwrite');
+                const store = transaction.objectStore('songs');
+                const song = { ...video, savedAt: Date.now() };
+                const request = store.put(song);
+                
+                request.onsuccess = () => {
+                    savedSongs.unshift(song);
+                    resolve();
+                };
+                request.onerror = () => reject(request.error);
+            });
+        };
+        
+        const removeSong = async (id) => {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(['songs'], 'readwrite');
+                const store = transaction.objectStore('songs');
+                const request = store.delete(id);
+                
+                request.onsuccess = () => {
+                    savedSongs = savedSongs.filter(s => s.id !== id);
+                    resolve();
+                };
+                request.onerror = () => reject(request.error);
+            });
+        };
+        
+        const isSongSaved = (id) => savedSongs.some(s => s.id === id);
+        
+        // UI Functions
+        const renderVideos = (videos) => {
+            const grid = document.getElementById('videoGrid');
+            
+            if (!videos || videos.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🎵</div>
+                        <div class="empty-title">No songs found</div>
+                        <p>Try searching for something else or check your library</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = videos.map(video => `
+                <div class="video-card" data-id="${video.id}">
+                    <div class="video-thumbnail">
+                        <img src="${video.thumbnail}" alt="${escapeHtml(video.title)}" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎵</text></svg>'">
+                        <div class="play-overlay" onclick="playVideo('${video.id}')">
+                            <div class="play-btn">▶</div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">${escapeHtml(video.title)}</div>
+                        <div class="video-channel">${escapeHtml(video.channel)}</div>
+                        <div class="video-actions">
+                            <button class="action-btn ${isSongSaved(video.id) ? 'saved btn-primary' : 'btn-secondary'}" 
+                                    onclick="toggleSave('${video.id}', '${escapeHtml(video.title)}', '${escapeHtml(video.channel)}', '${video.thumbnail}')"
+                                    ${!navigator.onLine && !isSongSaved(video.id) ? 'disabled' : ''}>
+                                ${isSongSaved(video.id) ? '✓ Saved' : '💾 Save Offline'}
+                            </button>
+                            <button class="action-btn btn-primary" onclick="playVideo('${video.id}')">
+                                ▶ Play
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        };
+        
+        const escapeHtml = (text) => {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        };
+        
+        const performSearch = async () => {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) return;
+            
+            if (!youtubeApiKey) {
+                showToast('Please configure your YouTube API key first', 'warning');
+                showApiSetup();
+                return;
+            }
+            
+            const grid = document.getElementById('videoGrid');
+            grid.innerHTML = '<div class="spinner"></div>';
+            
+            try {
+                if (!navigator.onLine) {
+                    showToast('You are offline. Showing saved songs only.', 'warning');
+                    await loadSavedSongs();
+                    renderVideos(savedSongs);
+                    return;
+                }
+                
+                searchResults = await searchYouTube(query);
+                renderVideos(searchResults);
+            } catch (error) {
+                showToast(error.message, 'error');
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">⚠️</div>
+                        <div class="empty-title">Search Failed</div>
+                        <p>${escapeHtml(error.message)}</p>
+                    </div>
+                `;
+            }
+        };
+        
+        const switchTab = async (tab) => {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+            
+            if (tab === 'library') {
+                await loadSavedSongs();
+                renderVideos(savedSongs);
+            } else {
+                if (searchResults.length > 0) {
+                    renderVideos(searchResults);
+                } else {
+                    document.getElementById('videoGrid').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">🔍</div>
+                            <div class="empty-title">Search for music</div>
+                            <p>Enter a song name above to find music on YouTube</p>
+                        </div>
+                    `;
+                }
+            }
+        };
+        
+        window.toggleSave = async (id, title, channel, thumbnail) => {
+            const btn = document.querySelector(`[data-id="${id}"] .action-btn:first-child`);
+            
+            try {
+                if (isSongSaved(id)) {
+                    await removeSong(id);
+                    btn.innerHTML = '💾 Save Offline';
+                    btn.classList.remove('saved', 'btn-primary');
+                    btn.classList.add('btn-secondary');
+                    showToast('Removed from library', 'success');
+                    if (currentTab === 'library') renderVideos(savedSongs);
+                } else {
+                    await saveSong({ id, title, channel, thumbnail });
+                    btn.innerHTML = '✓ Saved';
+                    btn.classList.remove('btn-secondary');
+                    btn.classList.add('saved', 'btn-primary');
+                    showToast('Saved for offline listening!', 'success');
+                }
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+            }
+        };
+        
+        window.playVideo = (videoId) => {
+            const container = document.getElementById('videoContainer');
+            container.innerHTML = `
+                <iframe 
+                    src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen
+                    loading="lazy">
+                </iframe>
+            `;
+            document.getElementById('playerModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        };
+        
+        window.closePlayer = (event) => {
+            if (!event || event.target.id === 'playerModal' || event.target.className === 'modal-close') {
+                document.getElementById('playerModal').classList.remove('active');
+                document.getElementById('videoContainer').innerHTML = '';
+                document.body.style.overflow = '';
+            }
+        };
+        
+        const showToast = (message, type = 'info') => {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : type === 'warning' ? '⚠' : 'ℹ';
+            toast.innerHTML = `<span>${icon}</span><span>${escapeHtml(message)}</span>`;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        };
+        
+        // Connection Status
+        const updateConnectionStatus = () => {
+            const statusEl = document.getElementById('connectionStatus');
+            const statusText = document.getElementById('statusText');
+            
+            if (navigator.onLine) {
+                statusEl.classList.remove('offline');
+                statusEl.classList.add('online');
+                statusText.textContent = 'Online';
+            } else {
+                statusEl.classList.remove('online');
+                statusEl.classList.add('offline');
+                statusText.textContent = 'Offline Mode';
+                showToast('You are offline. Saved songs still available!', 'warning');
+            }
+        };
+        
+        // PWA Install
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBtn').classList.add('visible');
+        });
+        
+        window.installApp = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('installBtn').classList.remove('visible');
+                showToast('App installed successfully!', 'success');
+            }
+            deferredPrompt = null;
+        };
+        
+        // Service Worker Registration
+        const registerSW = () => {
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    const CACHE_NAME = 'sonicvault-v1';
+                    const STATIC_ASSETS = [
+                        '/',
+                        '/index.html',
+                        '/styles.css',
+                        '/app.js'
+                    ];
+                    
+                    self.addEventListener('install', (event) => {
+                        event.waitUntil(
+                            caches.open(CACHE_NAME).then((cache) => {
+                                return cache.addAll(STATIC_ASSETS);
+                            })
+                        );
+                        self.skipWaiting();
+                    });
+                    
+                    self.addEventListener('activate', (event) => {
+                        event.waitUntil(self.clients.claim());
+                    });
+                    
+                    self.addEventListener('fetch', (event) => {
+                        const { request } = event;
+                        
+                        // Skip non-GET requests
+                        if (request.method !== 'GET') return;
+                        
+                        // Skip API requests
+                        if (request.url.includes('googleapis.com')) return;
+                        
+                        event.respondWith(
+                            caches.match(request).then((response) => {
+                                if (response) return response;
+                                return fetch(request).catch(() => {
+                                    // Return offline fallback for navigation requests
+                                    if (request.mode === 'navigate') {
+                                        return caches.match('/index.html');
+                                    }
+                                });
+                            })
+                        );
+                    });
+                `;
+                
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                
+                navigator.serviceWorker.register(swUrl)
+                    .then(reg => console.log('SW registered:', reg.scope))
+                    .catch(err => console.error('SW registration failed:', err));
+            }
+        };
+        
+        // Event Listeners
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+        
+        document.getElementById('searchInput')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch();
+        });
+        
+        // Initialize
+        const init = async () => {
+            await initDB();
+            await loadSavedSongs();
+            updateConnectionStatus();
+            updateApiStatus();
+            registerSW();
+            
+            // Load initial state
+            if (currentTab === 'library') {
+                renderVideos(savedSongs);
+            } else {
+                document.getElementById('videoGrid').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🎵</div>
+                        <div class="empty-title">Welcome to SonicVault</div>
+                        <p>${youtubeApiKey ? 'Search for music above or check your library' : 'Configure your YouTube API key to get started'}</p>
+                    </div>
+                `;
+            }
+        };
+        
+        // Start
+        init();
+    </script>
 </body>
 </html>
